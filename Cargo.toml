@@ -9,28 +9,28 @@ edition = "2021"
 actix = "0.13.0"
 actix-files = "0.6.2"
 actix-irc = "0.0.1"
-actix-web = "4.2.1"
-actix-web-actors = "4.1.0"
+actix-web = "4.3.1"
+actix-web-actors = "4.2.0"
 anyhow = "1.0.70"
-clap = { version = "4.0.29", features = ["derive"] }
+clap = { version = "4.2.4", features = ["derive"] }
 const_format = "0.2.30"
 crossbeam = "0.8.2"
 directories = "4.0.1"
 lazy_static = "1.4.0"
 parking_lot = "0.12.1"
 rand = "0.8.5"
-rayon = "1.6.0"
+rayon = "1.7.0"
 reqwest = { version = "0.11.13", features = ["json", "into_future"], git = "https://github.com/jewlexx/reqwest.git" }
 rotenv_codegen = "0.15.0"
-serde = { version = "1.0.147", features = ["derive"] }
-serde_json = "1.0.87"
-thiserror = "1.0.37"
-tokio = { version = "1.24.2", features = ["full"] }
-toml = "0.5.9"
+serde = { version = "1.0.160", features = ["derive"] }
+serde_json = "1.0.96"
+thiserror = "1.0.40"
+tokio = { version = "1.27.0", features = ["full"] }
+toml = "0.5.11"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.16"
 
 [build-dependencies]
 rotenv_codegen = "0.15.0"
-serde = { version = "1.0.147", features = ["derive"] }
-toml = "0.5.9"
+serde = { version = "1.0.160", features = ["derive"] }
+toml = "0.5.11"
