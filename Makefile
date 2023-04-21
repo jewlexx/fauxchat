@@ -6,10 +6,10 @@ update:
 	git submodule update --init --recursive
 
 apply:
-	cd chat && git apply ../patches/jChat.patch
+	cd chat && git diff > ../patches/jChat.patch
 
 patch:
-	cd chat && git diff > ../patches/jChat.patch
+	cd chat && git apply ../patches/jChat.patch
 
 unpatch:
 	cd chat && git reset --hard
