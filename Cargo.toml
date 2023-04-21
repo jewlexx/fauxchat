@@ -15,7 +15,7 @@ anyhow = "1.0.70"
 clap = { version = "4.0.29", features = ["derive"] }
 const_format = "0.2.30"
 crossbeam = "0.8.2"
-directories = "4.0.1"
+directories = "5.0.0"
 lazy_static = "1.4.0"
 parking_lot = "0.12.1"
 rand = "0.8.5"
