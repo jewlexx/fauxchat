@@ -12,7 +12,7 @@ actix-irc = "0.0.1"
 actix-web = "4.2.1"
 actix-web-actors = "4.1.0"
 anyhow = "1.0.70"
-clap = { version = "4.0.29", features = ["derive"] }
+clap = { version = "4.2.4", features = ["derive"] }
 const_format = "0.2.30"
 crossbeam = "0.8.2"
 directories = "4.0.1"
