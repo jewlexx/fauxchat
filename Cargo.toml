@@ -27,7 +27,7 @@ serde_json = "1.0.96"
 thiserror = "1.0.40"
 tokio = { version = "1.27.0", features = ["full"] }
 toml = "0.7.3"
-tracing = "0.1.37"
+tracing = "0.1.38"
 tracing-subscriber = "0.3.16"
 
 [build-dependencies]
