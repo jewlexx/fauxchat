@@ -278,34 +278,31 @@ impl UserPool {
 pub struct TwitchUsers {
     pub total: usize,
     pub data: Vec<Datum>,
-    pub pagination: Option<Pagination>,
+    pub pagination: Pagination,
 }
 
 impl TwitchUsers {
     pub async fn new() -> anyhow::Result<Self> {
         let mut total = 0;
-        let mut cursor = None;
+        let mut pag_cursor = None;
         let mut data = vec![];
 
         loop {
             let mut url = crate::api_url!("users/follows?to_id={user_id}&first=100").to_string();
 
-            if let Some(cursor) = cursor {
+            if let Some(cursor) = pag_cursor {
                 url.push_str(&format!("&after={cursor}"));
             }
 
-            let result: TwitchUsers = CLIENT
-                .get(crate::api_url!("users/follows?to_id={user_id}&first=100"))
-                .await?
-                .json()
-                .await?;
+            let result: TwitchUsers = CLIENT.get(url).await?.json().await?;
 
             // Not good to set it every single time but it's fine for now
             total += result.data.len();
             data.extend(result.data);
 
-            if let Some(pagination) = result.pagination {
-                cursor = Some(pagination.cursor);
+            if let Some(cursor) = result.pagination.cursor {
+                println!("paginating");
+                pag_cursor = Some(cursor);
             } else {
                 break;
             }
@@ -314,7 +311,7 @@ impl TwitchUsers {
         Ok(Self {
             total,
             data,
-            pagination: None,
+            pagination: Default::default(),
         })
     }
 }
@@ -330,7 +327,7 @@ pub struct Datum {
     pub followed_at: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Pagination {
-    pub cursor: String,
+    pub cursor: Option<String>,
 }
