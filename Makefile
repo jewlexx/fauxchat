@@ -20,3 +20,7 @@ commit:
 
 build:
 	cargo build --release
+
+run:
+	cargo r --bin pool
+	cargo r --bin fauxchat
