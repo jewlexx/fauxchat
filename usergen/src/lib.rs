@@ -1,5 +1,6 @@
 use openai::{completions::Completion, set_key};
 use rand::Rng;
+use serde::{Deserialize, Serialize};
 
 const PROMPT: &str = "Give me a twitch username for someone who enjoys gaming. It should not include the word gaming, it should not end with numbers. it should be creative, like a mix of two words or someones name, but absolutely should not just combine two words. Present just the username and no other text.";
 const EMPTY: String = String::new();
@@ -25,7 +26,7 @@ pub async fn generate_names<const N: usize>() -> anyhow::Result<[String; N]> {
     Ok(names)
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 pub struct Color {
     r: u8,
     g: u8,
@@ -65,6 +66,16 @@ impl Color {
         let luma = r * 0.2126 + g * 0.7152 + b * 0.0722;
 
         luma > 128.0
+    }
+}
+
+impl std::fmt::UpperHex for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:02X}", self.r)?;
+        write!(f, "{:02X}", self.g)?;
+        write!(f, "{:02X}", self.b)?;
+
+        Ok(())
     }
 }
 

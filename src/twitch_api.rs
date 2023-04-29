@@ -1,6 +1,7 @@
-use rand::{seq::SliceRandom, thread_rng, Rng};
+use rand::seq::SliceRandom;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
+use usergen::Color;
 
 lazy_static::lazy_static! {
     pub static ref CLIENT: reqwest::Client = {
@@ -38,6 +39,7 @@ pub struct UserPool {
 pub struct TwitchUser {
     pub name: String,
     pub uid: String,
+    pub color: Color,
     pub is_mod: bool,
     pub is_vip: bool,
     pub is_sub: bool,
@@ -110,36 +112,6 @@ impl std::fmt::Display for Badges {
     }
 }
 
-pub struct Color {
-    r: u8,
-    g: u8,
-    b: u8,
-}
-
-impl Color {
-    #[must_use]
-    pub const fn new(r: u8, g: u8, b: u8) -> Self {
-        Self { r, g, b }
-    }
-
-    #[must_use]
-    pub fn rand_new() -> Self {
-        let mut rng = thread_rng();
-
-        Self::new(rng.gen(), rng.gen(), rng.gen())
-    }
-}
-
-impl std::fmt::UpperHex for Color {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:02X}", self.r)?;
-        write!(f, "{:02X}", self.g)?;
-        write!(f, "{:02X}", self.b)?;
-
-        Ok(())
-    }
-}
-
 impl TwitchUser {
     pub fn send_message(&self, message: impl AsRef<str>) -> String {
         let msg = message.as_ref();
@@ -155,9 +127,7 @@ impl TwitchUser {
 
         message.push_str("client-nonce=6090b7621f1bf7bdcc46777cd522bca1;");
 
-        let color = Color::rand_new();
-
-        message.push_str(&format!("color=#{color:X};"));
+        message.push_str(&format!("color=#{:X};", self.color));
 
         message.push_str(&format!("display-name={};", self.name));
 
@@ -244,6 +214,7 @@ impl UserPool {
                 let mut pooled_user: TwitchUser = TwitchUser {
                     name: user.from_name.clone(),
                     uid: user.from_id.clone(),
+                    color: Color::generate_light(),
                     is_mod: false,
                     is_vip: false,
                     is_sub: false,
