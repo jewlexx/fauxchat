@@ -301,7 +301,6 @@ impl TwitchUsers {
             data.extend(result.data);
 
             if let Some(cursor) = result.pagination.cursor {
-                println!("paginating");
                 pag_cursor = Some(cursor);
             } else {
                 break;
