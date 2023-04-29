@@ -18,5 +18,5 @@ target/
 .env
 
 credentials.toml
-
 pool.json
+usernames.txt
