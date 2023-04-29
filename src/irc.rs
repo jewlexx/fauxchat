@@ -8,9 +8,10 @@ use rand::Rng;
 
 use crate::command::Command;
 
+#[allow(clippy::unused_async, clippy::needless_pass_by_value)]
 pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
     let resp = ws::start(FakeIrc { addrs: vec![] }, &req, stream);
-    println!("{:?}", resp);
+    println!("{resp:?}");
     resp
 }
 
@@ -19,6 +20,7 @@ pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpRes
 #[rtype(result = "()")]
 pub struct Message(pub String);
 
+#[allow(clippy::module_name_repetitions)]
 pub struct FakeIrc {
     pub addrs: Vec<Recipient<Message>>,
 }
@@ -80,7 +82,7 @@ impl Actor for FakeIrc {
     }
 }
 
-/// Handler for ws::Message message
+/// Handler for `ws::Message` message
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for FakeIrc {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         match msg {

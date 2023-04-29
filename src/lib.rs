@@ -1,3 +1,6 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
+
 use std::collections::VecDeque;
 
 use parking_lot::Mutex;

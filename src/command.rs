@@ -1,7 +1,7 @@
 use std::num::ParseIntError;
 
 #[derive(Debug, thiserror::Error)]
-pub enum CommandError {
+pub enum Error {
     #[error("The command provided was invalid. Found {0}")]
     InvalidCommand(String),
     #[error("No command was provided")]
@@ -20,7 +20,7 @@ pub enum Command {
 }
 
 impl TryFrom<String> for Command {
-    type Error = CommandError;
+    type Error = Error;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if let Some(command) = value.strip_prefix('/') {
@@ -38,7 +38,7 @@ impl TryFrom<String> for Command {
                         _ => Err(Self::Error::MissingNumber),
                     }?;
 
-                    Ok(Command::Write(msg.to_string(), count))
+                    Ok(Command::Write((*msg).to_string(), count))
                 }
                 Some(&"pause") => {
                     let count = match split.get(1) {
@@ -48,7 +48,7 @@ impl TryFrom<String> for Command {
 
                     Ok(Command::Pause(count))
                 }
-                Some(x) => Err(Self::Error::InvalidCommand(x.to_string())),
+                Some(x) => Err(Self::Error::InvalidCommand((*x).to_string())),
                 None => Err(Self::Error::MissingCommand),
             }
         } else {

@@ -48,6 +48,7 @@ pub struct Badges {
 }
 
 impl Badges {
+    #[must_use]
     pub fn from_user(user: &TwitchUser) -> Self {
         let uid = &crate::creds::CREDENTIALS.lock().user_id;
 
@@ -96,7 +97,7 @@ impl std::fmt::Display for Badges {
         write!(f, "badges=")?;
 
         for (i, badge) in self.inner.iter().enumerate() {
-            write!(f, "{}", badge)?;
+            write!(f, "{badge}")?;
 
             if i != self.inner.len() - 1 {
                 write!(f, ",")?;
@@ -116,10 +117,12 @@ pub struct Color {
 }
 
 impl Color {
+    #[must_use]
     pub const fn new(r: u8, g: u8, b: u8) -> Self {
         Self { r, g, b }
     }
 
+    #[must_use]
     pub fn rand_new() -> Self {
         let mut rng = thread_rng();
 
@@ -154,7 +157,7 @@ impl TwitchUser {
 
         let color = Color::rand_new();
 
-        message.push_str(&format!("color=#{:X};", color));
+        message.push_str(&format!("color=#{color:X};"));
 
         message.push_str(&format!("display-name={};", self.name));
 
@@ -184,7 +187,7 @@ impl TwitchUser {
                 .as_millis()
         };
 
-        message.push_str(&format!("tmi-sent-ts={};", current_time));
+        message.push_str(&format!("tmi-sent-ts={current_time};"));
 
         message.push_str("turbo=0;");
 
@@ -266,6 +269,7 @@ impl UserPool {
         Ok(UserPool { users })
     }
 
+    #[allow(clippy::missing_panics_doc)]
     pub fn send_message(&self, message: impl AsRef<str>) -> String {
         let mut rng = rand::thread_rng();
         let user = self.users.choose(&mut rng).unwrap();
@@ -310,7 +314,7 @@ impl TwitchUsers {
         Ok(Self {
             total,
             data,
-            pagination: Default::default(),
+            pagination: Pagination::default(),
         })
     }
 }
