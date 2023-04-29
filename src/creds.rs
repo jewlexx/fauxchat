@@ -84,6 +84,7 @@ impl Credentials {
 
         let resp: AccessToken = reqwest::Client::new()
             .post(REFRESH_URL)
+            .send()
             .await?
             .json()
             .await?;

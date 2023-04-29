@@ -211,6 +211,7 @@ impl UserPool {
             .get(crate::api_url!(
                 "channels/vips?broadcaster_id={user_id}&first=100"
             ))
+            .send()
             .await?
             .json()
             .await?;
@@ -219,6 +220,7 @@ impl UserPool {
             .get(crate::api_url!(
                 "moderation/moderators?broadcaster_id={user_id}&first=100"
             ))
+            .send()
             .await?
             .json()
             .await?;
@@ -228,6 +230,7 @@ impl UserPool {
             .get(crate::api_url!(
                 "subscriptions?broadcaster_id={user_id}&first=100"
             ))
+            .send()
             .await?
             .json()
             .await?;
@@ -298,7 +301,7 @@ impl TwitchUsers {
                 url.push_str(&format!("&after={cursor}"));
             }
 
-            let result: TwitchUsers = CLIENT.get(url).await?.json().await?;
+            let result: TwitchUsers = CLIENT.get(url).send().await?.json().await?;
 
             // Not good to set it every single time but it's fine for now
             total += result.data.len();
