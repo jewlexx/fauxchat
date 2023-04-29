@@ -1,3 +1,6 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
+
 use std::{collections::VecDeque, fs::File, io::Read, path::PathBuf};
 
 use actix_files::NamedFile;
@@ -5,7 +8,7 @@ use actix_web::{web, HttpRequest, Result};
 use clap::Parser;
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use fauxchat::*;
+use fauxchat::{creds, init_creds, irc, twitch_api, MESSAGES, USERS};
 
 use irc::handle_ws;
 pub use twitch_api::UserPool;
@@ -39,6 +42,7 @@ async fn twitch(req: HttpRequest) -> Result<NamedFile> {
     Ok(NamedFile::open_async(qualified_path).await?)
 }
 
+#[allow(clippy::unused_async)]
 #[actix_web::get("/credentials.js")]
 async fn credentials() -> Result<String> {
     let creds = creds::CREDENTIALS.lock();

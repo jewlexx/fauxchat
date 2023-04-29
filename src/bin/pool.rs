@@ -1,3 +1,6 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
+
 use fauxchat::twitch_api::UserPool;
 use tokio::{fs::File, io::AsyncWriteExt};
 
