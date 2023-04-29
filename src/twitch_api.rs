@@ -276,18 +276,24 @@ impl UserPool {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TwitchUsers {
-    pub total: i64,
+    pub total: usize,
     pub data: Vec<Datum>,
     pub pagination: Option<Pagination>,
 }
 
 impl TwitchUsers {
-    pub async fn new_with_len(max_length: usize) -> anyhow::Result<Self> {
-        let mut total;
-        let mut length = 0;
+    pub async fn new() -> anyhow::Result<Self> {
+        let mut total = 0;
+        let mut cursor = None;
         let mut data = vec![];
 
         loop {
+            let mut url = crate::api_url!("users/follows?to_id={user_id}&first=100").to_string();
+
+            if let Some(cursor) = cursor {
+                url.push_str(&format!("&after={cursor}"));
+            }
+
             let result: TwitchUsers = CLIENT
                 .get(crate::api_url!("users/follows?to_id={user_id}&first=100"))
                 .await?
@@ -295,11 +301,12 @@ impl TwitchUsers {
                 .await?;
 
             // Not good to set it every single time but it's fine for now
-            total = result.total;
-            length += result.data.len();
+            total += result.data.len();
             data.extend(result.data);
 
-            if result.pagination.is_none() || length >= max_length {
+            if let Some(pagination) = result.pagination {
+                cursor = Some(pagination.cursor);
+            } else {
                 break;
             }
         }
@@ -309,10 +316,6 @@ impl TwitchUsers {
             data,
             pagination: None,
         })
-    }
-
-    pub async fn new() -> anyhow::Result<Self> {
-        Self::new_with_len(100).await
     }
 }
 
