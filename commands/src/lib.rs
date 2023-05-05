@@ -24,7 +24,7 @@ pub enum Error {
     MissingNumber,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
     /// Sends the given message the given number of times
     Send(String, u64),

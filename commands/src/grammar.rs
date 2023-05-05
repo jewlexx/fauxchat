@@ -5,7 +5,7 @@ use pest::Parser;
 pub struct CommandsParser;
 
 impl CommandsParser {
-    pub fn commands(input: &str) -> Result<Vec<super::Command>, pest::error::Error<Rule>> {
+    pub fn commands(input: &str) -> anyhow::Result<Vec<super::Command>> {
         let mut commands = vec![];
 
         let ast = input
@@ -55,22 +55,23 @@ impl CommandsParser {
                     }
                     _ => continue,
                 }
-
-                // dbg!(part);
-
-                // match rule {
-                // }
             }
 
+            // TODO: Use litrs
             let command = match command_name {
                 "send" => {
-                    let message = args[0].to_string();
+                    let message = {
+                        let arg = args.remove(0);
+                        let lit = litrs::StringLit::parse(arg)?;
+                        let lit_value = lit.value();
+
+                        lit_value.to_string()
+                    };
                     let times = {
-                        let times = &args[1];
-                        if times.is_empty() {
-                            0_u64
+                        if args.is_empty() {
+                            1_u64
                         } else {
-                            times.parse().unwrap()
+                            args.remove(0).parse().unwrap()
                         }
                     };
 
@@ -92,12 +93,29 @@ impl CommandsParser {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::Command;
+
     const MESSAGES: &str = include_str!("../../messages.txt");
 
     #[test]
     fn test_parse() {
-        let commands = super::CommandsParser::commands(MESSAGES).unwrap();
+        let commands = CommandsParser::commands(MESSAGES).unwrap();
+        let mut commands_iter = commands.iter();
 
-        dbg!(commands);
+        let command = commands_iter.next().unwrap();
+
+        assert_eq!(command, &Command::Send("Hey!".to_string(), 10));
+
+        let command = commands_iter.next().unwrap();
+
+        assert_eq!(command, &Command::Send("Hello world!".to_string(), 1));
+
+        let command = commands_iter.next().unwrap();
+
+        assert_eq!(command, &Command::Sleep(1000));
+
+        // Ensure that we have exhausted the iterator
+        assert!(commands_iter.next().is_none());
     }
 }
