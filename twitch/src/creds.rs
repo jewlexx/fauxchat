@@ -23,6 +23,37 @@ lazy_static! {
 }
 
 impl Credentials {
+    pub fn load() -> anyhow::Result<Self> {
+        use std::{fs::File, io::Read};
+
+        let creds_path = Self::get_path()?;
+        if creds_path.exists() {
+            let mut file_contents = String::new();
+
+            File::open(creds_path)?.read_to_string(&mut file_contents)?;
+
+            Ok(toml::from_str(&file_contents)?)
+        } else {
+            let client_id = env!("TWITCH_CLIENT_ID").to_string();
+            let client_secret = env!("TWITCH_CLIENT_SECRET").to_string();
+            let user_id = env!("TWITCH_USER_ID").to_string();
+            let auth_token = env!("TWITCH_AUTH_TOKEN").to_string();
+            let refresh_token = env!("TWITCH_REFRESH_TOKEN").to_string();
+
+            let creds = Credentials {
+                client_id,
+                client_secret,
+                user_id,
+                auth_token,
+                refresh_token,
+            };
+
+            creds.save()?;
+
+            Ok(creds)
+        }
+    }
+
     pub fn get_path() -> anyhow::Result<PathBuf> {
         use std::fs::create_dir_all;
 
@@ -88,6 +119,8 @@ impl Credentials {
 
         self.refresh_token = resp.refresh_token;
 
+        self.save()?;
+
         Ok(())
     }
 
@@ -107,37 +140,7 @@ impl Credentials {
 }
 
 pub async fn init() -> anyhow::Result<()> {
-    use std::{fs::File, io::Read};
-
-    let creds_path = Credentials::get_path()?;
-
-    let mut creds: Credentials = {
-        if creds_path.exists() {
-            let mut file_contents = String::new();
-
-            File::open(creds_path)?.read_to_string(&mut file_contents)?;
-
-            toml::from_str(&file_contents)?
-        } else {
-            let client_id = env!("TWITCH_CLIENT_ID").to_string();
-            let client_secret = env!("TWITCH_CLIENT_SECRET").to_string();
-            let user_id = env!("TWITCH_USER_ID").to_string();
-            let auth_token = env!("TWITCH_AUTH_TOKEN").to_string();
-            let refresh_token = env!("TWITCH_REFRESH_TOKEN").to_string();
-
-            let creds = Credentials {
-                client_id,
-                client_secret,
-                user_id,
-                auth_token,
-                refresh_token,
-            };
-
-            creds.save()?;
-
-            creds
-        }
-    };
+    let mut creds = Credentials::load()?;
 
     if creds.remain_30().await? {
         creds.refresh().await?;
