@@ -6,21 +6,16 @@ use std::{
 use const_format::formatcp;
 use lazy_static::lazy_static;
 use parking_lot::Mutex;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+
+mod decl;
+
+pub use decl::Credentials;
 
 #[derive(Debug, Deserialize)]
 pub struct AccessToken {
     access_token: String,
     refresh_token: String,
-}
-
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct Credentials {
-    pub client_id: String,
-    pub client_secret: String,
-    pub user_id: String,
-    pub auth_token: String,
-    pub refresh_token: String,
 }
 
 lazy_static! {
@@ -109,4 +104,46 @@ impl Credentials {
 
         Ok(())
     }
+}
+
+pub async fn init() -> anyhow::Result<()> {
+    use std::{fs::File, io::Read};
+
+    let creds_path = Credentials::get_path()?;
+
+    let mut creds: Credentials = {
+        if creds_path.exists() {
+            let mut file_contents = String::new();
+
+            File::open(creds_path)?.read_to_string(&mut file_contents)?;
+
+            toml::from_str(&file_contents)?
+        } else {
+            let client_id = env!("TWITCH_CLIENT_ID").to_string();
+            let client_secret = env!("TWITCH_CLIENT_SECRET").to_string();
+            let user_id = env!("TWITCH_USER_ID").to_string();
+            let auth_token = env!("TWITCH_AUTH_TOKEN").to_string();
+            let refresh_token = env!("TWITCH_REFRESH_TOKEN").to_string();
+
+            let creds = Credentials {
+                client_id,
+                client_secret,
+                user_id,
+                auth_token,
+                refresh_token,
+            };
+
+            creds.save()?;
+
+            creds
+        }
+    };
+
+    if creds.remain_30().await? {
+        creds.refresh().await?;
+    }
+
+    *CREDENTIALS.lock() = creds;
+
+    Ok(())
 }

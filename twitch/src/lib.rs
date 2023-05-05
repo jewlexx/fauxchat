@@ -3,6 +3,19 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use usergen::Color;
 
+pub mod creds;
+
+#[macro_export]
+macro_rules! api_url {
+    ($url:literal) => {{
+        use const_format::formatcp;
+
+        const URL: &str = formatcp!($url, user_id = env!("TWITCH_USER_ID"));
+
+        formatcp!("https://api.twitch.tv/helix/{}", URL)
+    }};
+}
+
 lazy_static::lazy_static! {
     pub static ref CLIENT: reqwest::Client = {
         use reqwest::header::HeaderValue;
@@ -175,7 +188,6 @@ impl TwitchUser {
 }
 
 impl UserPool {
-    #[instrument]
     pub async fn get() -> anyhow::Result<Self> {
         let vips: TwitchVips = CLIENT
             .get(crate::api_url!(

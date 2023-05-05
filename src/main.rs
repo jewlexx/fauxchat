@@ -8,10 +8,10 @@ use actix_web::{web, HttpRequest, Result};
 use clap::Parser;
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use fauxchat::{creds, init_creds, irc, twitch_api, MESSAGES, USERS};
+use fauxchat::{irc, MESSAGES, USERS};
 
 use irc::handle_ws;
-pub use twitch_api::UserPool;
+pub use twitch_api::{creds, UserPool};
 
 // TODO: In release builds, include all files from chat frontend in binary
 
@@ -81,7 +81,7 @@ async fn main() -> anyhow::Result<()> {
         }
     });
 
-    init_creds().await?;
+    creds::init().await?;
 
     // Must be initialized after credentials
     lazy_static::initialize(&twitch_api::CLIENT);

@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = ["usergen"]
+members = ["usergen", "twitch"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -33,6 +33,7 @@ toml = "0.7.3"
 tracing = "0.1.37"
 tracing-subscriber = "0.3.16"
 
+twitch_api = { path = "twitch" }
 usergen = { path = "usergen" }
 
 [build-dependencies]
