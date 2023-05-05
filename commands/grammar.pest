@@ -3,7 +3,22 @@ endline = { "\r\n" | "\n" | EOI }
 command_prefix = { "/" }
 comment_prefix = { "#" }
 
-command_action    = { (ASCII_ALPHA | ASCII_DIGIT)+ }
-command_arguments = { (ASCII_ALPHA | ASCII_DIGIT)+ ~ (endline | WHITE_SPACE+) }
+char   =  {
+    !("\"" | "\\") ~ ANY
+  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+  | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+inner  = @{ char* }
+string = ${ "\"" ~ inner ~ "\"" }
 
-command = { SOI ~ command_prefix ~ command_action ~ (endline | WHITE_SPACE+) ~ command_arguments* ~ EOI }
+number = { ASCII_DIGIT+ }
+
+command_action    = { ASCII_ALPHA+ }
+command_argument  = { number | string }
+command_arguments = { WHITE_SPACE* ~ command_argument }
+command_single    = { command_prefix ~ command_action ~ command_arguments* }
+
+comment_content = { (!endline ~ ANY)* }
+comment_single  = { comment_prefix ~ WHITE_SPACE ~ comment_content }
+
+file = { ((command_single | comment_single) ~ endline)* ~ EOI }
