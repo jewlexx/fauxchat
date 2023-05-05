@@ -106,12 +106,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-irc"
-version = "0.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8d8b0810c7297016d7aac2885bda725063de2c2b449ba0bb870af17dbdb5e36"
-
-[[package]]
 name = "actix-macros"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -583,20 +577,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "crossbeam"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2801af0d36612ae591caa9568261fddce32ce6e08a7275ea334a06a4ad021a2c"
-dependencies = [
- "cfg-if",
- "crossbeam-channel",
- "crossbeam-deque",
- "crossbeam-epoch",
- "crossbeam-queue",
- "crossbeam-utils",
-]
-
-[[package]]
 name = "crossbeam-channel"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -628,16 +608,6 @@ dependencies = [
  "crossbeam-utils",
  "memoffset",
  "scopeguard",
-]
-
-[[package]]
-name = "crossbeam-queue"
-version = "0.3.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1cfb3ea8a53f37c40dea2c7bedcbd88bdfae54f5e2175d6ecaff1c988353add"
-dependencies = [
- "cfg-if",
- "crossbeam-utils",
 ]
 
 [[package]]
@@ -820,20 +790,17 @@ version = "0.1.0"
 dependencies = [
  "actix",
  "actix-files",
- "actix-irc",
  "actix-web",
  "actix-web-actors",
  "anyhow",
  "clap",
  "const_format",
- "crossbeam",
  "directories",
  "lazy_static",
  "parking_lot",
  "rand",
  "rayon",
  "reqwest",
- "rotenv_codegen",
  "serde",
  "serde_json",
  "thiserror",
@@ -1179,15 +1146,6 @@ name = "linux-raw-sys"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b64f40e5e03e0d54f03845c8197d0291253cdbedfb1cb46b13c2c117554a9f4c"
-
-[[package]]
-name = "litrs"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9275e0933cf8bb20f008924c0cb07a0692fe54d8064996520bf998de9eb79aa"
-dependencies = [
- "proc-macro2",
-]
 
 [[package]]
 name = "local-channel"
@@ -1600,25 +1558,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
-]
-
-[[package]]
-name = "rotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6354f480638123f29ee786ba4471311270d2cb7813f9e360114a314a458dba05"
-
-[[package]]
-name = "rotenv_codegen"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e4dc4a613d61898d8bc0b675e0a0ccd8a546440f6bfd26f38d5cd817d431b78"
-dependencies = [
- "litrs",
- "proc-macro2",
- "quote",
- "rotenv",
- "syn 1.0.109",
 ]
 
 [[package]]
