@@ -4,9 +4,7 @@ command_prefix = { "/" }
 comment_prefix = { "#" }
 
 char   =  {
-    !("\"" | "\\") ~ ANY
-  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
-  | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+    !endline ~ (!("\"" | "\\") ~ ANY | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t") | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4}))
 }
 inner  = @{ char* }
 string = ${ "\"" ~ inner ~ "\"" }
@@ -19,6 +17,6 @@ command_arguments = { WHITE_SPACE* ~ command_argument }
 command_single    = { command_prefix ~ command_action ~ command_arguments* }
 
 comment_content = { (!endline ~ ANY)* }
-comment_single  = { comment_prefix ~ WHITE_SPACE ~ comment_content }
+comment_single  = { comment_prefix ~ comment_content }
 
 file = { ((command_single | comment_single) ~ endline)* ~ EOI }
