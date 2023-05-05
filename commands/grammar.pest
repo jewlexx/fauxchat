@@ -1,0 +1,9 @@
+endline = { "\r\n" | "\n" | EOI }
+
+command_prefix = { "/" }
+comment_prefix = { "#" }
+
+command_action    = { (ASCII_ALPHA | ASCII_DIGIT)+ }
+command_arguments = { (ASCII_ALPHA | ASCII_DIGIT)+ ~ (endline | WHITE_SPACE+) }
+
+command = { SOI ~ command_prefix ~ command_action ~ (endline | WHITE_SPACE+) ~ command_arguments* ~ EOI }
