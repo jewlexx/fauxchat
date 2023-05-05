@@ -1,6 +1,5 @@
 endline = { "\r\n" | "\n" | EOI }
 
-command_prefix = { "/" }
 comment_prefix = { "#" }
 
 char   =  {
@@ -8,13 +7,15 @@ char   =  {
 }
 inner  = @{ char* }
 string = ${ "\"" ~ inner ~ "\"" }
+blank  =  { WHITE_SPACE? }
+// paren  = ${ "(" | ")" }
 
 number = { ASCII_DIGIT+ }
 
 command_action    = { ASCII_ALPHA+ }
 command_argument  = { number | string }
 command_arguments = { WHITE_SPACE* ~ command_argument }
-command_single    = { command_prefix ~ command_action ~ command_arguments* }
+command_single    = { command_action ~ "(" ~ (command_arguments ~ ("," ~ command_arguments)*)? ~ ")" }
 
 comment_content = { (!endline ~ ANY)* }
 comment_single  = { comment_prefix ~ WHITE_SPACE ~ comment_content }

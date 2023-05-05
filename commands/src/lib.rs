@@ -1,6 +1,14 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
+
 use std::num::ParseIntError;
 
 use thiserror::Error;
+
+#[macro_use]
+extern crate pest_derive;
+
+pub mod grammar;
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -16,6 +24,7 @@ pub enum Error {
     MissingNumber,
 }
 
+#[derive(Debug, Clone)]
 pub enum Command {
     /// Sends the given message the given number of times
     Send(String, u64),

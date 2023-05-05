@@ -1,8 +1,8 @@
 # Write "Hey!" 10 times
-/send "Hey!" 10
+send("Hey!", 10)
 
 # Write "Hello World!" once
-/send "Hello world!"
+send("Hello world!")
 
 # Pause for 1 second
-/sleep 1000
+sleep(1000)
