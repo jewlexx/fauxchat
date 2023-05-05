@@ -28,7 +28,7 @@ pub enum Error {
 pub enum Command {
     /// Sends the given message the given number of times
     Send(String, u64),
-    /// Pauses for the given number of seconds
+    /// Pauses for the given number of milliseconds
     Sleep(u64),
 }
 

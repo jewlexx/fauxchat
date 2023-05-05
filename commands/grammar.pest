@@ -10,10 +10,9 @@ string = ${ "\"" ~ inner ~ "\"" }
 
 number = { ASCII_DIGIT+ }
 
-command_action    = { ASCII_ALPHA+ }
-command_argument  = { number | string }
-command_arguments = { WHITE_SPACE* ~ command_argument }
-command_single    = { command_action ~ "(" ~ (command_arguments ~ ("," ~ command_arguments)*)? ~ ")" }
+command_action   = { ASCII_ALPHA+ }
+command_argument = { number | string }
+command_single   = { command_action ~ "(" ~ ((WHITE_SPACE* ~ command_argument) ~ ("," ~ (WHITE_SPACE* ~ command_argument))*)? ~ ")" }
 
 comment_content = { (!endline ~ ANY)* }
 comment_single  = { comment_prefix ~ WHITE_SPACE ~ comment_content }
