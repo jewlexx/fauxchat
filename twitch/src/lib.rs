@@ -20,8 +20,8 @@ lazy_static::lazy_static! {
     pub static ref CLIENT: reqwest::Client = {
         use reqwest::header::HeaderValue;
         let mut default_headers = reqwest::header::HeaderMap::new();
-        default_headers.insert("Client-Id", HeaderValue::from_str(&crate::creds::CREDENTIALS.lock().client_id).unwrap());
-        default_headers.insert("Authorization", HeaderValue::from_str(&format!("Bearer {}", crate::creds::CREDENTIALS.lock().auth_token)).unwrap());
+        default_headers.insert("Client-Id", HeaderValue::from_str(&crate::creds::CREDENTIALS.blocking_lock().client_id).unwrap());
+        default_headers.insert("Authorization", HeaderValue::from_str(&format!("Bearer {}", crate::creds::CREDENTIALS.blocking_lock().auth_token)).unwrap());
 
         reqwest::Client::builder().default_headers(default_headers)
             .build()
@@ -65,7 +65,7 @@ pub struct Badges {
 impl Badges {
     #[must_use]
     pub fn from_user(user: &TwitchUser) -> Self {
-        let uid = &crate::creds::CREDENTIALS.lock().user_id;
+        let uid = &crate::creds::CREDENTIALS.blocking_lock().user_id;
 
         let mut badges = Vec::new();
 

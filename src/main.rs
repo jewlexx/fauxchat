@@ -45,7 +45,7 @@ async fn twitch(req: HttpRequest) -> Result<NamedFile> {
 #[allow(clippy::unused_async)]
 #[actix_web::get("/credentials.js")]
 async fn credentials() -> Result<String> {
-    let creds = creds::CREDENTIALS.lock();
+    let creds = creds::CREDENTIALS.lock().await;
 
     let client_id = &creds.client_id;
     let api_token = &creds.auth_token;
@@ -71,13 +71,15 @@ async fn main() -> anyhow::Result<()> {
 
     let args = CmdArgs::parse();
 
-    std::thread::spawn(|| loop {
-        use std::io;
+    tokio::spawn(async {
+        loop {
+            use std::io;
 
-        let mut buf = String::new();
+            let mut buf = String::new();
 
-        if io::stdin().read_line(&mut buf).is_ok() {
-            MESSAGES.lock().push_back(buf);
+            if io::stdin().read_line(&mut buf).is_ok() {
+                MESSAGES.lock().await.push_back(buf);
+            }
         }
     });
 
@@ -94,7 +96,7 @@ async fn main() -> anyhow::Result<()> {
             UserPool::get().await?
         };
 
-        *USERS.lock() = pool;
+        *USERS.lock().await = pool;
 
         // A file containing one message per line
         let msgs_path = {
@@ -115,7 +117,7 @@ async fn main() -> anyhow::Result<()> {
 
         let msgs: VecDeque<String> = msgs_str.lines().map(String::from).collect();
 
-        *MESSAGES.lock() = msgs;
+        *MESSAGES.lock().await = msgs;
     }
 
     HttpServer::new(|| {

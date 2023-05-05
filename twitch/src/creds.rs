@@ -5,8 +5,8 @@ use std::{
 
 use const_format::formatcp;
 use lazy_static::lazy_static;
-use parking_lot::Mutex;
 use serde::Deserialize;
+use tokio::sync::Mutex;
 
 mod decl;
 
@@ -20,6 +20,12 @@ pub struct AccessToken {
 
 lazy_static! {
     pub static ref CREDENTIALS: Mutex<Credentials> = Mutex::new(Credentials::default());
+}
+
+impl Default for Credentials {
+    fn default() -> Self {
+        Self::load().unwrap()
+    }
 }
 
 impl Credentials {
@@ -140,13 +146,11 @@ impl Credentials {
 }
 
 pub async fn init() -> anyhow::Result<()> {
-    let mut creds = Credentials::load()?;
+    let mut creds = CREDENTIALS.lock().await;
 
     if creds.remain_30().await? {
         creds.refresh().await?;
     }
-
-    *CREDENTIALS.lock() = creds;
 
     Ok(())
 }

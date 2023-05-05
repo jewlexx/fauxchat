@@ -3,7 +3,7 @@
 
 use std::collections::VecDeque;
 
-use parking_lot::Mutex;
+use tokio::sync::Mutex;
 use twitch_api::UserPool;
 
 pub mod irc;
@@ -11,7 +11,7 @@ pub mod irc;
 #[macro_use]
 extern crate tracing;
 
-pub static USERS: Mutex<UserPool> = Mutex::new(UserPool { users: Vec::new() });
+pub static USERS: Mutex<UserPool> = Mutex::const_new(UserPool { users: Vec::new() });
 
 lazy_static::lazy_static! {
     pub static ref MESSAGES: Mutex<VecDeque<String>> = Mutex::new(VecDeque::new());
