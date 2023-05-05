@@ -9,7 +9,7 @@ edition = "2021"
 anyhow = "1.0.71"
 openai = { version = "1.0.0-alpha.8", features = ["reqwest"] }
 rand = "0.8.5"
-serde = "1.0.160"
+serde = "1.0.162"
 
 [dev-dependencies]
 tokio = { version = "1.28.0", features = ["full"] }
