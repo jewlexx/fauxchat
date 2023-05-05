@@ -6,7 +6,6 @@ use std::collections::VecDeque;
 use parking_lot::Mutex;
 use twitch_api::UserPool;
 
-pub mod command;
 pub mod irc;
 
 #[macro_use]

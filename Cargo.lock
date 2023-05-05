@@ -506,6 +506,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
+name = "commands"
+version = "0.1.0"
+dependencies = [
+ "thiserror",
+]
+
+[[package]]
 name = "const_format"
 version = "0.2.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -794,6 +801,7 @@ dependencies = [
  "actix-web-actors",
  "anyhow",
  "clap",
+ "commands",
  "const_format",
  "lazy_static",
  "parking_lot",
