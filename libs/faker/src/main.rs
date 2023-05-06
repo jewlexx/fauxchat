@@ -8,7 +8,7 @@ use actix_web::{web, HttpRequest, Result};
 use clap::Parser;
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use fauxchat::{irc, MESSAGES, USERS};
+use faker::{irc, MESSAGES, USERS};
 
 use irc::handle_ws;
 pub use twitch_api::{creds, UserPool};
