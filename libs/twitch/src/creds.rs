@@ -5,8 +5,8 @@ use std::{
 
 use const_format::formatcp;
 use lazy_static::lazy_static;
+use parking_lot::Mutex;
 use serde::Deserialize;
-use tokio::sync::Mutex;
 
 mod decl;
 
@@ -31,15 +31,17 @@ impl Default for Credentials {
 impl Credentials {
     /// Clone the current credentials, not meant to be modified, but drops the lock
     pub fn read() -> Credentials {
-        CREDENTIALS.blocking_lock().clone()
+        CREDENTIALS.lock().clone()
     }
 
     pub async fn init() -> anyhow::Result<()> {
-        let mut creds = CREDENTIALS.lock().await;
+        let mut creds = Credentials::read();
 
         if creds.remain_30().await? {
             creds.refresh().await?;
         }
+
+        creds.save()?;
 
         Ok(())
     }
@@ -155,6 +157,8 @@ impl Credentials {
         let mut file = File::create(path)?;
 
         file.write_all(creds_str.as_bytes())?;
+
+        *CREDENTIALS.lock() = self.clone();
 
         Ok(())
     }

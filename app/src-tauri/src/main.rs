@@ -47,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
             let mut buf = String::new();
 
             if io::stdin().read_line(&mut buf).is_ok() {
-                faker::MESSAGES.lock().await.push_back(buf);
+                faker::MESSAGES.lock().push_back(buf);
             }
         }
     });
@@ -65,7 +65,7 @@ async fn main() -> anyhow::Result<()> {
             faker::twitch_api::UserPool::get().await?
         };
 
-        *faker::USERS.lock().await = pool;
+        *faker::USERS.lock() = pool;
 
         // A file containing one message per line
         let msgs_path = {
@@ -86,7 +86,7 @@ async fn main() -> anyhow::Result<()> {
 
         let msgs: VecDeque<String> = msgs_str.lines().map(String::from).collect();
 
-        *faker::MESSAGES.lock().await = msgs;
+        *faker::MESSAGES.lock() = msgs;
     }
 
     HttpServer::new(|| {

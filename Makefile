@@ -18,9 +18,11 @@ commit:
 	make patch
 	git commit -S -a
 
-build:
-	cargo build --release
+pool:
+	cargo r -p twitch_api
 
-run:
-	cargo r --bin pool
-	cargo r --bin fauxchat
+build: pool
+	cd app && pnpm tauri dev
+
+run: pool
+	cd app && pnpm tauri dev
