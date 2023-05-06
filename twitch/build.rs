@@ -1,23 +1,14 @@
 use std::io::Read;
 
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize)]
-struct Credentials {
-    client_id: String,
-    client_secret: String,
-    user_id: String,
-    auth_token: String,
-    refresh_token: String,
-}
+include!("src/creds/decl.rs");
 
 fn main() {
-    println!("cargo:rerun-if-changed=credentials.toml");
+    println!("cargo:rerun-if-changed=../credentials.toml");
 
     let pwd = std::env::current_dir().unwrap();
 
     let creds: Credentials = {
-        let creds_path = pwd.join("credentials.toml");
+        let creds_path = pwd.join("../credentials.toml");
 
         if !creds_path.exists() {
             panic!("credentials.toml file does not exist");

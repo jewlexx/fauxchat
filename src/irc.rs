@@ -6,7 +6,7 @@ use actix_web_actors::ws;
 
 use rand::Rng;
 
-use crate::command::Command;
+use commands::Command;
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
 pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
@@ -38,7 +38,7 @@ impl Actor for FakeIrc {
 
             let mut rng = rand::thread_rng();
 
-            let msg = crate::MESSAGES.lock().pop_front();
+            let msg = crate::MESSAGES.blocking_lock().pop_front();
 
             if let Some(msg) = msg {
                 // Skip any comments or empty lines
@@ -59,9 +59,9 @@ impl Actor for FakeIrc {
                 let parsed = Command::try_from(msg).unwrap();
 
                 match parsed {
-                    Command::Write(ref message, count) => {
+                    Command::Send(ref message, count) => {
                         for _ in 0..count {
-                            let parsed = crate::USERS.lock().send_message(message);
+                            let parsed = crate::USERS.blocking_lock().send_message(message);
                             ctx.text(parsed);
 
                             let millis: u64 = rng.gen_range(50..1500);
@@ -71,7 +71,7 @@ impl Actor for FakeIrc {
                             thread::sleep(Duration::from_millis(millis));
                         }
                     }
-                    Command::Pause(millis) => thread::sleep(Duration::from_millis(millis)),
+                    Command::Sleep(millis) => thread::sleep(Duration::from_millis(millis)),
                 }
 
                 debug!("Message sent");

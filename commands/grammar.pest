@@ -1,0 +1,23 @@
+endline = { "\r\n" | "\n" | EOI }
+
+comment_prefix = { "#" }
+
+char   =  {
+    !endline ~ (!("\"" | "\\") ~ ANY | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t") | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4}))
+}
+inner  = @{ char* }
+string = ${ "\"" ~ inner ~ "\"" }
+
+number = { ASCII_DIGIT+ }
+
+command_action   = { ASCII_ALPHA+ }
+command_argument = { number | string }
+command_single   = { command_action ~ "(" ~ ((WHITE_SPACE* ~ command_argument) ~ ("," ~ (WHITE_SPACE* ~ command_argument))*)? ~ ")" }
+
+comment_content = { (!endline ~ ANY)* }
+comment_single  = { comment_prefix ~ WHITE_SPACE ~ comment_content }
+
+line = { (command_single | comment_single) ~ endline }
+
+// Note that file does not currently work
+file = { (((command_single | comment_single) ~ endline) | endline)* ~ EOI }

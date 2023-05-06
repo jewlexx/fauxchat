@@ -1,12 +1,12 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use fauxchat::twitch_api::UserPool;
 use tokio::{fs::File, io::AsyncWriteExt};
+use twitch_api::UserPool;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    fauxchat::init_creds().await?;
+    twitch_api::creds::init().await?;
 
     let pool = UserPool::get().await?;
 
