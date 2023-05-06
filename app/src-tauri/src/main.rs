@@ -3,10 +3,11 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::{collections::VecDeque, fs::File, io::Read, path::PathBuf};
+use std::{collections::VecDeque, io::Read, path::PathBuf};
 
 use actix_web::{web, App, HttpServer};
 use clap::Parser;
+use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
 use faker::twitch_api::creds::Credentials;
@@ -58,14 +59,20 @@ async fn main() -> anyhow::Result<()> {
     lazy_static::initialize(&faker::twitch_api::CLIENT);
 
     {
-        let pool = if PathBuf::from("pool.json").exists() {
-            let file = File::open("pool.json")?;
-            serde_json::from_reader(file)?
+        let pool = if PathBuf::from("../pool.json").exists() {
+            let mut file = File::open("../pool.json").await?;
+            let mut file_str = String::new();
+            file.read_to_string(&mut file_str).await?;
+            serde_json::from_str(&file_str)?
         } else {
             faker::twitch_api::UserPool::get().await?
         };
 
+        println!("Created pool");
+
         *faker::USERS.lock() = pool;
+
+        println!("Assigned users");
 
         // A file containing one message per line
         let msgs_path = {
@@ -78,16 +85,29 @@ async fn main() -> anyhow::Result<()> {
             }
         };
 
-        let mut msgs_file = File::open(msgs_path)?;
+        println!("Opening messages");
+        let mut msgs_file = File::open(msgs_path).await?;
 
+        println!("Created messages string");
         let mut msgs_str = String::new();
 
-        msgs_file.read_to_string(&mut msgs_str)?;
+        println!("Reading messages");
+        msgs_file.read_to_string(&mut msgs_str).await?;
 
+        println!("Parsing messages");
         let msgs: VecDeque<String> = msgs_str.lines().map(String::from).collect();
 
+        println!("Assigning messages");
         *faker::MESSAGES.lock() = msgs;
+        println!("Assigned messages");
     }
+
+    println!("Running app");
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![greet])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+    println!("Ran app");
 
     HttpServer::new(|| {
         App::new()
@@ -98,11 +118,6 @@ async fn main() -> anyhow::Result<()> {
     .bind(("127.0.0.1", 8080))?
     .run()
     .await?;
-
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
 
     Ok(())
 }

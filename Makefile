@@ -1,6 +1,9 @@
 .PHONY: setup build
 
-setup: update apply
+setup: app_init update apply
+
+app_init:
+	cd app && pnpm i
 
 update:
 	git submodule update --init --recursive
