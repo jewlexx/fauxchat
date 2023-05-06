@@ -96,7 +96,7 @@ mod tests {
     use super::*;
     use crate::Command;
 
-    const MESSAGES: &str = include_str!("../../messages.txt");
+    const MESSAGES: &str = include_str!("../../../messages.txt");
 
     #[test]
     fn test_parse() {

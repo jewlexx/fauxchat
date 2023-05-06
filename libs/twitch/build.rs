@@ -3,12 +3,12 @@ use std::io::Read;
 include!("src/creds/decl.rs");
 
 fn main() {
-    println!("cargo:rerun-if-changed=../credentials.toml");
-
     let pwd = std::env::current_dir().unwrap();
 
     let creds: Credentials = {
-        let creds_path = pwd.join("../credentials.toml");
+        let creds_path = pwd.join("../../credentials.toml");
+
+        println!("cargo:rerun-if-changed={}", creds_path.display());
 
         if !creds_path.exists() {
             panic!("credentials.toml file does not exist");
