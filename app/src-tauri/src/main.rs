@@ -74,6 +74,7 @@ async fn main() -> anyhow::Result<()> {
 
         println!("Assigned users");
 
+        // TODO: Remove messages file in place of admin ui
         // A file containing one message per line
         let msgs_path = {
             let cwd = std::env::current_dir().unwrap();
