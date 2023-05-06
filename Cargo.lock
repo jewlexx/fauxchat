@@ -389,11 +389,28 @@ checksum = "9c7d0618f0e0b7e8ff11427422b64564d5fb0be1940354bfe2e0529b18a9d9b8"
 name = "app"
 version = "0.0.0"
 dependencies = [
+ "actix",
+ "actix-files",
+ "actix-web",
+ "actix-web-actors",
+ "anyhow",
+ "clap",
+ "const_format",
  "faker",
+ "lazy_static",
+ "rand 0.8.5",
+ "rayon",
+ "reqwest",
+ "rotenv_codegen",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
+ "thiserror",
+ "tokio",
+ "toml 0.7.3",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
