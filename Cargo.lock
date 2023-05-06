@@ -510,7 +510,7 @@ name = "commands"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "litrs",
+ "litrs 0.4.0",
  "pest",
  "pest_derive",
  "thiserror",
@@ -809,6 +809,10 @@ dependencies = [
  "const_format",
  "lazy_static",
  "rand",
+ "rayon",
+ "reqwest",
+ "rotenv_codegen",
+ "serde",
  "serde_json",
  "thiserror",
  "tokio",
@@ -1153,6 +1157,15 @@ name = "linux-raw-sys"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b64f40e5e03e0d54f03845c8197d0291253cdbedfb1cb46b13c2c117554a9f4c"
+
+[[package]]
+name = "litrs"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9275e0933cf8bb20f008924c0cb07a0692fe54d8064996520bf998de9eb79aa"
+dependencies = [
+ "proc-macro2",
+]
 
 [[package]]
 name = "litrs"
@@ -1621,6 +1634,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "rotenv"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6354f480638123f29ee786ba4471311270d2cb7813f9e360114a314a458dba05"
+
+[[package]]
+name = "rotenv_codegen"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e4dc4a613d61898d8bc0b675e0a0ccd8a546440f6bfd26f38d5cd817d431b78"
+dependencies = [
+ "litrs 0.2.3",
+ "proc-macro2",
+ "quote",
+ "rotenv",
+ "syn 1.0.109",
+]
+
+[[package]]
 name = "rustc_version"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1695,18 +1727,18 @@ checksum = "bebd363326d05ec3e2f532ab7660680f3b02130d780c299bca73469d521bc0ed"
 
 [[package]]
 name = "serde"
-version = "1.0.160"
+version = "1.0.162"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb2f3770c8bce3bcda7e149193a069a0f4365bda1fa5cd88e03bca26afc1216c"
+checksum = "71b2f6e1ab5c2b98c05f0f35b236b22e8df7ead6ffbf51d7808da7f8817e7ab6"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.160"
+version = "1.0.162"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291a097c63d8497e00160b166a967a4a79c64f3facdd01cbd7502231688d77df"
+checksum = "a2a0814352fd64b58489904a44ea8d90cb1a91dcb6b4f5ebabc32c8318e93cb6"
 dependencies = [
  "proc-macro2",
  "quote",
