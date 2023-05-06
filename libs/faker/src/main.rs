@@ -11,7 +11,7 @@ use tracing_subscriber::fmt::format::FmtSpan;
 use faker::{irc, MESSAGES, USERS};
 
 use irc::handle_ws;
-pub use twitch_api::{creds, UserPool};
+pub use twitch_api::{creds::Credentials, UserPool};
 
 // TODO: In release builds, include all files from chat frontend in binary
 
@@ -45,10 +45,10 @@ async fn twitch(req: HttpRequest) -> Result<NamedFile> {
 #[allow(clippy::unused_async)]
 #[actix_web::get("/credentials.js")]
 async fn credentials() -> Result<String> {
-    let creds = creds::CREDENTIALS.lock().await;
+    let creds = Credentials::read();
 
-    let client_id = &creds.client_id;
-    let api_token = &creds.auth_token;
+    let client_id = creds.client_id;
+    let api_token = creds.auth_token;
 
     let file = format!(
         r#"
@@ -83,7 +83,7 @@ async fn main() -> anyhow::Result<()> {
         }
     });
 
-    creds::init().await?;
+    Credentials::init().await?;
 
     // Must be initialized after credentials
     lazy_static::initialize(&twitch_api::CLIENT);

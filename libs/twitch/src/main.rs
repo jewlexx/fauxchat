@@ -6,7 +6,7 @@ use twitch_api::UserPool;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    twitch_api::creds::init().await?;
+    twitch_api::creds::Credentials::init().await?;
 
     let pool = UserPool::get().await?;
 

@@ -29,6 +29,21 @@ impl Default for Credentials {
 }
 
 impl Credentials {
+    /// Clone the current credentials, not meant to be modified, but drops the lock
+    pub fn read() -> Credentials {
+        CREDENTIALS.blocking_lock().clone()
+    }
+
+    pub async fn init() -> anyhow::Result<()> {
+        let mut creds = CREDENTIALS.lock().await;
+
+        if creds.remain_30().await? {
+            creds.refresh().await?;
+        }
+
+        Ok(())
+    }
+
     pub fn load() -> anyhow::Result<Self> {
         use std::{fs::File, io::Read};
 
@@ -143,14 +158,4 @@ impl Credentials {
 
         Ok(())
     }
-}
-
-pub async fn init() -> anyhow::Result<()> {
-    let mut creds = CREDENTIALS.lock().await;
-
-    if creds.remain_30().await? {
-        creds.refresh().await?;
-    }
-
-    Ok(())
 }

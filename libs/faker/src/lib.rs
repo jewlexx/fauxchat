@@ -6,6 +6,8 @@ use std::collections::VecDeque;
 use tokio::sync::Mutex;
 use twitch_api::UserPool;
 
+pub use twitch_api;
+
 pub mod irc;
 
 #[macro_use]
