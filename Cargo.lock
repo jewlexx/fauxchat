@@ -1227,16 +1227,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "fastrand"
-version = "1.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e51093e27b0797c359783294ca4f0a911c270184cb10f85783b118614a1501be"
-dependencies = [
- "instant",
-]
-
-[[package]]
-name = "fauxchat"
+name = "faker"
 version = "0.1.0"
 dependencies = [
  "actix",
@@ -1261,6 +1252,15 @@ dependencies = [
  "tracing-subscriber",
  "twitch_api",
  "usergen",
+]
+
+[[package]]
+name = "fastrand"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e51093e27b0797c359783294ca4f0a911c270184cb10f85783b118614a1501be"
+dependencies = [
+ "instant",
 ]
 
 [[package]]
@@ -4123,6 +4123,7 @@ dependencies = [
  "anyhow",
  "const_format",
  "directories",
+ "dunce",
  "lazy_static",
  "rand 0.8.5",
  "rayon",
