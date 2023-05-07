@@ -1,9 +1,12 @@
+use parking_lot::Mutex;
 use rand::seq::SliceRandom;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use usergen::Color;
 
 pub mod creds;
+
+pub static USERS: Mutex<UserPool> = Mutex::new(UserPool { users: Vec::new() });
 
 #[macro_export]
 macro_rules! api_url {
@@ -48,7 +51,7 @@ pub struct UserPool {
     pub users: Vec<TwitchUser>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TwitchUser {
     pub name: String,
     pub uid: String,
@@ -56,6 +59,36 @@ pub struct TwitchUser {
     pub is_mod: bool,
     pub is_vip: bool,
     pub is_sub: bool,
+}
+
+impl TwitchUser {
+    // Please ensure that user pool is initialized before calling this function
+    pub fn from_username(username: impl AsRef<str>) -> Self {
+        let username = username.as_ref();
+
+        crate::USERS
+            .lock()
+            .users
+            .iter()
+            .find(|user| user.name == username)
+            .cloned()
+            .unwrap_or_else(|| Self::fake_from_username(username))
+    }
+
+    pub fn fake_from_username(username: impl AsRef<str>) -> Self {
+        use rand::Rng;
+
+        let mut rng = rand::thread_rng();
+
+        Self {
+            name: username.as_ref().to_string(),
+            uid: "fake_uid".to_string(),
+            color: Color::generate_light(),
+            is_mod: false,
+            is_vip: false,
+            is_sub: rng.gen(),
+        }
+    }
 }
 
 pub struct Badges {
@@ -260,6 +293,10 @@ impl UserPool {
         let mut rng = rand::thread_rng();
         let user = self.users.choose(&mut rng).unwrap();
 
+        user.send_message(message)
+    }
+
+    pub fn send_message_as(&self, message: impl AsRef<str>, user: &TwitchUser) -> String {
         user.send_message(message)
     }
 }

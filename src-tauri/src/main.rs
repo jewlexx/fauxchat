@@ -9,7 +9,7 @@ use actix_web::{web, App, HttpServer};
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use faker::twitch_api::creds::Credentials;
+use faker::twitch_api::{creds::Credentials, TwitchUser};
 
 mod irc;
 mod routes;
@@ -23,6 +23,13 @@ fn greet(name: &str) -> String {
     format!("Hello, {name}! You've been greeted from Rust!")
 }
 
+#[tauri::command]
+fn send_message(message: &str, username: &str) {
+    faker::MESSAGES
+        .lock()
+        .push_back((message.to_string(), TwitchUser::from_username(username)));
+}
+
 // TODO: In release builds, include all files from chat frontend in binary
 
 #[tokio::main]
@@ -31,18 +38,6 @@ async fn main() -> anyhow::Result<()> {
         .with_span_events(FmtSpan::FULL)
         .with_max_level(tracing::Level::INFO)
         .init();
-
-    tokio::spawn(async {
-        loop {
-            use std::io;
-
-            let mut buf = String::new();
-
-            if io::stdin().read_line(&mut buf).is_ok() {
-                faker::MESSAGES.lock().push_back(buf);
-            }
-        }
-    });
 
     Credentials::init().await?;
 
@@ -81,7 +76,7 @@ async fn main() -> anyhow::Result<()> {
 
     println!("Running app");
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![greet, send_message])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     println!("App closed");

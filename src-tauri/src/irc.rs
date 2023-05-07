@@ -40,7 +40,7 @@ impl Actor for FakeIrc {
 
             let msg = faker::MESSAGES.lock().pop_front();
 
-            if let Some(msg) = msg {
+            if let Some((msg, user)) = msg {
                 // Skip any comments or empty lines
                 if msg.starts_with('#') || msg.is_empty() {
                     return;
@@ -61,7 +61,7 @@ impl Actor for FakeIrc {
                 match parsed {
                     Command::Send(ref message, count) => {
                         for _ in 0..count {
-                            let parsed = faker::USERS.lock().send_message(message);
+                            let parsed = user.send_message(message);
                             ctx.text(parsed);
 
                             let millis: u64 = rng.gen_range(50..1500);

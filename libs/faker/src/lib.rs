@@ -8,16 +8,14 @@ use std::{
 
 use parking_lot::Mutex;
 
-use twitch_api::UserPool;
-
 pub use commands;
 pub use twitch_api;
 pub use usergen;
 
-pub static USERS: Mutex<UserPool> = Mutex::new(UserPool { users: Vec::new() });
+pub use twitch_api::USERS;
 
 lazy_static::lazy_static! {
-    pub static ref MESSAGES: Mutex<VecDeque<String>> = Mutex::new(VecDeque::new());
+    pub static ref MESSAGES: Mutex<VecDeque<(String, twitch_api::TwitchUser)>> = Mutex::new(VecDeque::new());
 }
 
 #[must_use]
