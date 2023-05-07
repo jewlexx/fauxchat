@@ -8,6 +8,24 @@ index f73960c..dc01400 100644
  t/
  .vscode
 \ No newline at end of file
+diff --git a/404.html b/404.html
+new file mode 100644
+index 0000000..fc71192
+--- /dev/null
++++ b/404.html
+@@ -0,0 +1,12 @@
++<!DOCTYPE html>
++<html lang="en">
++  <head>
++    <meta charset="UTF-8" />
++    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>404 Not Found</title>
++  </head>
++  <body>
++    404 Not Found
++  </body>
++</html>
 diff --git a/README.md b/README.md
 index cae6a81..37b25ed 100644
 --- a/README.md
