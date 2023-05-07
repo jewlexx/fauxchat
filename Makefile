@@ -9,7 +9,7 @@ update:
 	git submodule update --init --recursive
 
 apply:
-	cd chat && git diff --cached > ../patches/jChat.patch
+	cd chat && git add . && git diff --cached > ../patches/jChat.patch
 
 patch:
 	cd chat && git apply ../patches/jChat.patch --reject

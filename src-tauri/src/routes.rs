@@ -40,7 +40,28 @@ async fn twitch(req: HttpRequest) -> HttpResponse {
     };
 
     if let Some(file) = CHAT_DIR.get_file(path) {
-        let contents = file.contents();
+        let contents = {
+            let path_contents = file.contents();
+            let mut contents: Vec<u8> = vec![];
+            if path.contains("script.js") {
+                let prefix = format!(
+                    "// Injected by server
+// Port determined at runtime, based off environment variables, or a preset default of 8080
+// URL will remain 127.0.0.1 unless future developments change it
+const URL = '127.0.0.1';
+const PORT = '{}';
+// End injected section\n",
+                    crate::port()
+                );
+
+                contents.extend(prefix.as_bytes());
+            }
+
+            contents.extend(path_contents);
+
+            contents
+        };
+
         let mime = mime_type(path.to_string());
 
         HttpResponse::Ok().content_type(mime).body(contents)
