@@ -23,11 +23,6 @@ fn greet(name: &str) -> String {
     format!("Hello, {name}! You've been greeted from Rust!")
 }
 
-fn port() -> u16 {
-    let port_var = std::env::var("FAUXCHAT_PORT").unwrap_or("8080".to_string());
-    port_var.parse().unwrap()
-}
-
 // TODO: In release builds, include all files from chat frontend in binary
 
 #[tokio::main]
@@ -76,7 +71,7 @@ async fn main() -> anyhow::Result<()> {
             .service(routes::credentials)
             .route("/ws/", web::get().to(irc::handle_ws))
     })
-    .bind(("127.0.0.1", port()))
+    .bind(faker::addr())
     .expect("valid url and successful binding")
     .run();
 
