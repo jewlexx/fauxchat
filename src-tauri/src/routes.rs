@@ -1,12 +1,34 @@
-use actix_files::NamedFile;
-use actix_web::{HttpRequest, Result};
+use std::path::PathBuf;
+
+use actix_web::{HttpRequest, HttpResponse, Result};
+use include_dir::{include_dir, Dir};
+
+static CHAT_DIR: Dir<'_> = include_dir!("chat");
 
 // User follows reference: https://dev.twitch.tv/docs/api/reference#get-users-follows
 // And to get user id in the first place: https://dev.twitch.tv/docs/api/reference#get-users
 
+fn mime_type<'a>(path: String) -> &'a str {
+    let path = PathBuf::from(path);
+    let ext = path.extension().unwrap();
+
+    match ext.to_string_lossy().to_string().as_str() {
+        "" => "text/plain",
+        "html" => "text/html",
+        "css" => "text/css",
+        "js" => "application/javascript",
+        "png" => "image/png",
+        "gif" => "image/gif",
+        "jpg" | "jpeg" => "image/jpeg",
+        "bmp" => "image/bmp",
+        "svg" => "image/svg+xml",
+        _ => "application/octet-stream",
+    }
+}
+
+#[allow(clippy::unused_async)]
 #[actix_web::get("/twitch/{filename:.*}")]
-async fn twitch(req: HttpRequest) -> Result<NamedFile> {
-    let base_path = std::env::current_dir().expect("current working directory");
+async fn twitch(req: HttpRequest) -> HttpResponse {
     let path = {
         let query = req.match_info().query("filename");
 
@@ -17,9 +39,17 @@ async fn twitch(req: HttpRequest) -> Result<NamedFile> {
         }
     };
 
-    let qualified_path = base_path.join("../chat").join(path);
+    if let Some(file) = CHAT_DIR.get_file(path) {
+        let contents = file.contents();
+        let mime = mime_type(path.to_string());
 
-    Ok(NamedFile::open_async(qualified_path).await?)
+        HttpResponse::Ok().content_type(mime).body(contents)
+    } else {
+        let notfound_page = CHAT_DIR.get_file("404.html").expect("404 page").contents();
+        HttpResponse::NotFound()
+            .content_type("text/html")
+            .body(notfound_page)
+    }
 }
 
 #[allow(clippy::unused_async)]
