@@ -26,20 +26,12 @@ fn greet(name: &str) -> String {
 
 // TODO: In release builds, include all files from chat frontend in binary
 
-#[derive(Debug, Parser)]
-struct CmdArgs {
-    #[clap(short, long)]
-    messages_file: Option<PathBuf>,
-}
-
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_span_events(FmtSpan::FULL)
         .with_max_level(tracing::Level::INFO)
         .init();
-
-    let args = CmdArgs::parse();
 
     tokio::spawn(async {
         loop {
@@ -58,67 +50,50 @@ async fn main() -> anyhow::Result<()> {
     // Must be initialized after credentials
     lazy_static::initialize(&faker::twitch_api::CLIENT);
 
-    {
-        let pool = if PathBuf::from("../pool.json").exists() {
-            let mut file = File::open("../pool.json").await?;
-            let mut file_str = String::new();
-            file.read_to_string(&mut file_str).await?;
-            serde_json::from_str(&file_str)?
-        } else {
-            faker::twitch_api::UserPool::get().await?
-        };
+    let pool = if PathBuf::from("../pool.json").exists() {
+        let mut file = File::open("../pool.json").await?;
+        let mut file_str = String::new();
+        file.read_to_string(&mut file_str).await?;
+        serde_json::from_str(&file_str)?
+    } else {
+        faker::twitch_api::UserPool::get().await?
+    };
 
-        println!("Created pool");
+    println!("Created pool");
 
-        *faker::USERS.lock() = pool;
+    *faker::USERS.lock() = pool;
 
-        println!("Assigned users");
+    println!("Assigned users");
 
-        // TODO: Remove messages file in place of admin ui
-        // A file containing one message per line
-        let msgs_path = {
-            let cwd = std::env::current_dir().unwrap();
+    let port = {
+        let port_var = std::env::var("FAUXCHAT_PORT").unwrap_or("8080".to_string());
+        port_var.parse().unwrap()
+    };
 
-            if let Some(path) = args.messages_file {
-                cwd.join(path)
-            } else {
-                cwd.join("messages.txt")
-            }
-        };
+    let fut = HttpServer::new(|| {
+        println!("Creating app");
+        App::new()
+            .service(routes::twitch)
+            .service(routes::credentials)
+            .route("/ws/", web::get().to(irc::handle_ws))
+    })
+    .bind(("127.0.0.1", port))
+    .expect("valid url and successful binding")
+    .run();
 
-        println!("Opening messages");
-        let mut msgs_file = File::open(msgs_path).await?;
-
-        println!("Created messages string");
-        let mut msgs_str = String::new();
-
-        println!("Reading messages");
-        msgs_file.read_to_string(&mut msgs_str).await?;
-
-        println!("Parsing messages");
-        let msgs: VecDeque<String> = msgs_str.lines().map(String::from).collect();
-
-        println!("Assigning messages");
-        *faker::MESSAGES.lock() = msgs;
-        println!("Assigned messages");
-    }
+    let server_thread = tokio::spawn(async move {
+        fut.await.expect("valid running of http server");
+    });
 
     println!("Running app");
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-    println!("Ran app");
+    println!("App closed");
 
-    HttpServer::new(|| {
-        App::new()
-            .service(routes::twitch)
-            .service(routes::credentials)
-            .route("/ws/", web::get().to(irc::handle_ws))
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await?;
+    // Close the server when the app is closed
+    server_thread.abort();
 
     Ok(())
 }
