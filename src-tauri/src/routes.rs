@@ -6,10 +6,7 @@ use actix_web::{HttpRequest, Result};
 
 #[actix_web::get("/twitch/{filename:.*}")]
 async fn twitch(req: HttpRequest) -> Result<NamedFile> {
-    let base_path = {
-        let current_path = std::env::current_dir().unwrap();
-        current_path.join("..").join("chat")
-    };
+    let base_path = std::env::current_dir().expect("current working directory");
     let path = {
         let query = req.match_info().query("filename");
 
@@ -20,7 +17,7 @@ async fn twitch(req: HttpRequest) -> Result<NamedFile> {
         }
     };
 
-    let qualified_path = base_path.join("chat").join(path);
+    let qualified_path = base_path.join("../chat").join(path);
 
     Ok(NamedFile::open_async(qualified_path).await?)
 }
