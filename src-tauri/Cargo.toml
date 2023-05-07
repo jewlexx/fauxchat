@@ -31,7 +31,7 @@ thiserror = "1.0.40"
 tokio = { version = "1.28.0", features = ["full"] }
 toml = "0.7.3"
 tracing = "0.1.37"
-tracing-subscriber = "0.3.16"
+tracing-subscriber = "0.3.17"
 
 faker = { path = "../libs/faker" }
 include_dir = "0.7.3"
