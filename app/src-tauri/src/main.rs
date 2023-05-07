@@ -3,10 +3,9 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::{collections::VecDeque, io::Read, path::PathBuf};
+use std::path::PathBuf;
 
 use actix_web::{web, App, HttpServer};
-use clap::Parser;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 

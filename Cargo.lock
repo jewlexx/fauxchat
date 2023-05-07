@@ -394,7 +394,6 @@ dependencies = [
  "actix-web",
  "actix-web-actors",
  "anyhow",
- "clap",
  "const_format",
  "faker",
  "lazy_static",

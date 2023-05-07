@@ -25,7 +25,7 @@ pool:
 	cargo r -p twitch_api
 
 build: pool
-	cd app && pnpm tauri dev
+	cd app && pnpm tauri build
 
 run: pool
 	cd app && pnpm tauri dev
