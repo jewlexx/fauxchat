@@ -12,7 +12,7 @@ apply:
 	cd chat && git diff > ../patches/jChat.patch
 
 patch:
-	cd chat && git apply ../patches/jChat.patch
+	cd chat && git apply ../patches/jChat.patch --reject
 
 unpatch:
 	cd chat && git reset --hard
