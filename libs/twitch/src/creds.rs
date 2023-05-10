@@ -4,7 +4,7 @@ use std::{
 };
 
 use const_format::formatcp;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use serde::Deserialize;
 
@@ -18,9 +18,7 @@ pub struct AccessToken {
     refresh_token: String,
 }
 
-lazy_static! {
-    pub static ref CREDENTIALS: Mutex<Credentials> = Mutex::new(Credentials::default());
-}
+pub static CREDENTIALS: Lazy<Mutex<Credentials>> = Lazy::new(|| Mutex::new(Credentials::default()));
 
 impl Default for Credentials {
     fn default() -> Self {

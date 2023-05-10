@@ -14,9 +14,8 @@ pub use usergen;
 
 pub use twitch_api::USERS;
 
-lazy_static::lazy_static! {
-    pub static ref MESSAGES: Mutex<VecDeque<(String, twitch_api::TwitchUser)>> = Mutex::new(VecDeque::new());
-}
+pub static MESSAGES: Lazy<Mutex<VecDeque<(String, twitch_api::TwitchUser)>>> =
+    Lazy::new(|| Mutex::new(VecDeque::new()));
 
 #[must_use]
 pub const fn url() -> Ipv4Addr {

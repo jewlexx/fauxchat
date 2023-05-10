@@ -1,3 +1,4 @@
+use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use rand::seq::SliceRandom;
 use rayon::prelude::*;
@@ -19,18 +20,27 @@ macro_rules! api_url {
     }};
 }
 
-lazy_static::lazy_static! {
-    pub static ref CLIENT: reqwest::Client = {
-        use reqwest::header::HeaderValue;
-        let mut default_headers = reqwest::header::HeaderMap::new();
-        default_headers.insert("Client-Id", HeaderValue::from_str(&crate::creds::CREDENTIALS.lock().client_id).unwrap());
-        default_headers.insert("Authorization", HeaderValue::from_str(&format!("Bearer {}", crate::creds::CREDENTIALS.lock().auth_token)).unwrap());
+pub static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
+    use reqwest::header::HeaderValue;
+    let mut default_headers = reqwest::header::HeaderMap::new();
+    default_headers.insert(
+        "Client-Id",
+        HeaderValue::from_str(&crate::creds::CREDENTIALS.lock().client_id).unwrap(),
+    );
+    default_headers.insert(
+        "Authorization",
+        HeaderValue::from_str(&format!(
+            "Bearer {}",
+            crate::creds::CREDENTIALS.lock().auth_token
+        ))
+        .unwrap(),
+    );
 
-        reqwest::Client::builder().default_headers(default_headers)
-            .build()
-            .unwrap()
-    };
-}
+    reqwest::Client::builder()
+        .default_headers(default_headers)
+        .build()
+        .unwrap()
+});
 
 // Must retrieve list of followers, subscribers, mods, vips, etc. and match against the list of users in the channel
 
