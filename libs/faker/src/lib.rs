@@ -6,6 +6,7 @@ use std::{
     net::{Ipv4Addr, SocketAddrV4},
 };
 
+use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 
 pub use commands;

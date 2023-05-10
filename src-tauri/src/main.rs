@@ -42,7 +42,7 @@ async fn main() -> anyhow::Result<()> {
     Credentials::init().await?;
 
     // Must be initialized after credentials
-    once_cell::force(&faker::twitch_api::CLIENT);
+    once_cell::sync::Lazy::force(&faker::twitch_api::CLIENT);
 
     let pool = if PathBuf::from("../pool.json").exists() {
         let mut file = File::open("../pool.json").await?;
