@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 rayon = "1.7.0"
-serde = { version = "1.0.160", features = ["derive"] }
+serde = { version = "1.0.163", features = ["derive"] }
 reqwest = { version = "0.11.13", features = ["json"] }
 
 usergen = { path = "../usergen" }
@@ -23,5 +23,5 @@ once_cell = { version = "1.17.1", features = ["parking_lot"] }
 
 [build-dependencies]
 dunce = "1.0.4"
-serde = { version = "1.0.160", features = ["derive"] }
+serde = { version = "1.0.163", features = ["derive"] }
 toml = "0.7.3"
