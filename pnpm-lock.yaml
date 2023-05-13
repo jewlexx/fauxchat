@@ -22,6 +22,9 @@ dependencies:
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
+  react-iframe:
+    specifier: 1.8.5
+    version: 1.8.5(react@18.2.0)
   react-syntax-highlighter:
     specifier: 15.5.0
     version: 15.5.0(react@18.2.0)
@@ -1567,6 +1570,15 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
+
+  /react-iframe@1.8.5(react@18.2.0):
+    resolution: {integrity: sha512-F4cQJGs3ydaG6fJWfuz9yLwOU0Trzl6kttXuUG+vYwosH8enOOFxZWEDQCSbNVO8ayjfYZeqLxEvdvcsSy4GvA==}
+    peerDependencies:
+      react: '>=16.x.x'
+    dependencies:
+      object-assign: 4.1.1
+      react: 18.2.0
     dev: false
 
   /react-is@16.13.1:
