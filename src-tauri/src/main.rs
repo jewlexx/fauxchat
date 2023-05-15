@@ -24,10 +24,12 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn send_message(message: &str, username: &str) {
-    faker::MESSAGES
-        .lock()
-        .push_back((message.to_string(), TwitchUser::from_username(username)));
+fn send_message(message: &str, username: &str, count: usize) {
+    for _ in 0..count {
+        faker::MESSAGES
+            .lock()
+            .push_back((message.to_string(), TwitchUser::from_username(username)));
+    }
 }
 
 // TODO: In release builds, include all files from chat frontend in binary

@@ -1,5 +1,5 @@
 import { type FunctionComponent } from 'react';
-import { Card } from '@mui/material';
+import { Card } from '@mui/joy';
 import Iframe from 'react-iframe';
 import { invoke } from '@tauri-apps/api/tauri';
 import './index.scss';

@@ -1,24 +1,37 @@
 import { useState } from 'react';
-import reactLogo from './assets/react.svg';
+import { Input, Select, Option } from '@mui/joy';
 import { invoke } from '@tauri-apps/api/tauri';
 import Chat from './Chat';
-import './App.scss';
+import styles from './App.module.scss';
+
+enum Command {
+  Send,
+  Sleep,
+}
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState('');
-  const [name, setName] = useState('');
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke('greet', { name }));
-  }
+  const [message, setMessage] = useState('');
+  const [count, setCount] = useState(0);
+  const [command, setCommand] = useState(Command.Send);
 
   return (
-    <div className="container">
+    <div className={styles.container}>
       <Chat
         url="127.0.0.1"
         port="8080"
         path="/twitch/v2/index.html?channel=maybejules&size=3&font=0&stroke=0&shadow=0&fade=30"
+      />
+      <Select placeholder="Choose command" value={command}>
+        <Option value={Command.Send}>Send</Option>
+        <Option value={Command.Sleep}>Sleep</Option>
+      </Select>
+      {command === Command.Send && (
+        <Input value={message} onChange={(e) => setMessage(e.target.value)} />
+      )}
+      <Input
+        type="number"
+        value={count}
+        onChange={(e) => setCount(parseInt(e.target.value, 10))}
       />
     </div>
   );
