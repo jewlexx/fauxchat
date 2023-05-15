@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Input, Select, Option } from '@mui/joy';
+import { Input, Select, Option, Button } from '@mui/joy';
 import { invoke } from '@tauri-apps/api/tauri';
 import Chat from './Chat';
 import styles from './App.module.scss';
@@ -37,6 +37,16 @@ function App() {
         value={count}
         onChange={(e) => setCount(parseInt(e.target.value, 10))}
       />
+
+      <Button
+        placeholder="Send Message"
+        onClick={() => {
+          throw {
+            name: 'NotImplementedError',
+            message: 'too lazy to implement',
+          };
+        }}
+      ></Button>
     </div>
   );
 }
