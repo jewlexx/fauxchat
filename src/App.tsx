@@ -12,7 +12,7 @@ enum Command {
 function App() {
   const [message, setMessage] = useState('');
   const [count, setCount] = useState(0);
-  const [command, setCommand] = useState(Command.Send);
+  const [command, setCommand] = useState<Command | null>(null);
 
   return (
     <div className={styles.container}>
@@ -21,7 +21,11 @@ function App() {
         port="8080"
         path="/twitch/v2/index.html?channel=maybejules&size=3&font=0&stroke=0&shadow=0&fade=30"
       />
-      <Select placeholder="Choose command" value={command}>
+      <Select
+        placeholder="Choose command"
+        value={command}
+        onChange={(_, newValue) => setCommand(newValue)}
+      >
         <Option value={Command.Send}>Send</Option>
         <Option value={Command.Sleep}>Sleep</Option>
       </Select>
