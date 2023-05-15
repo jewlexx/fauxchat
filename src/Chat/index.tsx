@@ -13,7 +13,7 @@ interface Props {
 const Chat: FunctionComponent<Props> = ({ port, url = '127.0.0.1', path }) => {
   return (
     <Card>
-      <Iframe url={`127.0.0.1:${port}/${path}`} />
+      <Iframe url={`http://${url}:${port}${path}`} />
     </Card>
   );
 };

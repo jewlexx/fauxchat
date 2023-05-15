@@ -15,7 +15,11 @@ function App() {
 
   return (
     <div className="container">
-      <Chat port="8080" url="127.0.0.1" path="/twitch/index.html" />
+      <Chat
+        url="127.0.0.1"
+        port="8080"
+        path="/twitch/v2/index.html?channel=maybejules&size=3&font=0&stroke=0&shadow=0&fade=30"
+      />
     </div>
   );
 }
