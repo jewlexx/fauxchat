@@ -24,18 +24,21 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn send_message(message: &str, username: &str, count: usize) {
-    let user = {
-        if username == "random" {
-            TwitchUser::random()
-        } else {
-            TwitchUser::from_username(username)
-        }
-    };
+fn send_message(message: &str, username: &str, count: usize, delay: u64) {
     for _ in 0..count {
+        let user = {
+            if username == "random" {
+                TwitchUser::random()
+            } else {
+                TwitchUser::from_username(username)
+            }
+        };
+
         faker::MESSAGES
             .lock()
             .push_back((message.to_string(), user.clone()));
+
+        std::thread::sleep(std::time::Duration::from_millis(delay));
     }
 }
 

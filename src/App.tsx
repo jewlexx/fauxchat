@@ -12,6 +12,7 @@ enum Command {
 function App() {
   const [message, setMessage] = useState('');
   const [count, setCount] = useState(0);
+  const [delay, setDelay] = useState(0);
   const [command, setCommand] = useState<Command | null>(null);
 
   // TODO: User Picker
@@ -32,12 +33,23 @@ function App() {
         <Option value={Command.Sleep}>Sleep</Option>
       </Select>
       {command === Command.Send && (
-        <Input value={message} onChange={(e) => setMessage(e.target.value)} />
+        <>
+          <Input value={message} onChange={(e) => setMessage(e.target.value)} />
+
+          <Input
+            type="number"
+            placeholder="Count"
+            value={count}
+            onChange={(e) => setCount(parseInt(e.target.value, 10))}
+          />
+        </>
       )}
+
       <Input
         type="number"
+        placeholder="Delay"
         value={count}
-        onChange={(e) => setCount(parseInt(e.target.value, 10))}
+        onChange={(e) => setDelay(parseInt(e.target.value, 10))}
       />
 
       <Button
@@ -52,6 +64,7 @@ function App() {
           const p = invoke('send_message', {
             message,
             count,
+            delay,
           });
 
           p.then(() => {
