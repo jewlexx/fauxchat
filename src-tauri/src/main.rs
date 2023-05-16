@@ -25,6 +25,13 @@ fn greet(name: &str) -> String {
 
 #[tauri::command]
 fn send_message(message: &str, username: &str, count: usize) {
+    let user = {
+        if username == "random" {
+            TwitchUser::random()
+        } else {
+            TwitchUser::from_username(username)
+        }
+    };
     for _ in 0..count {
         faker::MESSAGES
             .lock()

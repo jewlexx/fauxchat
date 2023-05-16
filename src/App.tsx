@@ -41,10 +41,16 @@ function App() {
       <Button
         placeholder="Send Message"
         onClick={() => {
-          throw {
-            name: 'NotImplementedError',
-            message: 'too lazy to implement',
-          };
+          if (command == Command.Sleep) {
+            throw {
+              name: 'NotImplementedError',
+              message: 'sleep command is not implemented yet',
+            };
+          }
+          const p = invoke('send_message', {
+            message,
+            count,
+          });
         }}
       ></Button>
     </div>
