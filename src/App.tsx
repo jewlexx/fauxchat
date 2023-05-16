@@ -53,6 +53,11 @@ function App() {
             message,
             count,
           });
+
+          p.then(() => {
+            setMessage('');
+            setCount(0);
+          });
         }}
       ></Button>
     </div>
