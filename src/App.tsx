@@ -14,6 +14,8 @@ function App() {
   const [count, setCount] = useState(0);
   const [command, setCommand] = useState<Command | null>(null);
 
+  // TODO: User Picker
+
   return (
     <div className={styles.container}>
       <Chat
