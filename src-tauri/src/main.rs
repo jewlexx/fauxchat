@@ -35,11 +35,9 @@ fn send_message(message: &str, username: &str, count: usize) {
     for _ in 0..count {
         faker::MESSAGES
             .lock()
-            .push_back((message.to_string(), TwitchUser::from_username(username)));
+            .push_back((message.to_string(), user.clone()));
     }
 }
-
-// TODO: In release builds, include all files from chat frontend in binary
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
