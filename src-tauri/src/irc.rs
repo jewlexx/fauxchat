@@ -38,9 +38,8 @@ impl Actor for FakeIrc {
 
             let mut rng = rand::thread_rng();
 
-            let msg = faker::MESSAGES.lock().pop_front();
-
-            if let Some((msg, user)) = msg {
+            // Iterate over all possible messages at once, rather than waiting a second to send the next one
+            while let Some((msg, user)) = faker::MESSAGES.lock().pop_front() {
                 // Skip any comments or empty lines
                 if msg.starts_with('#') || msg.is_empty() {
                     return;
@@ -75,8 +74,6 @@ impl Actor for FakeIrc {
                 }
 
                 debug!("Message sent");
-            } else {
-                debug!("No message to print");
             }
         });
     }
