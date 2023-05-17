@@ -53,7 +53,6 @@ function App() {
       />
 
       <Button
-        placeholder="Send Message"
         onClick={() => {
           if (command == Command.Sleep) {
             throw {
@@ -62,6 +61,7 @@ function App() {
             };
           }
           const p = invoke('send_message', {
+            username: 'random',
             message,
             count,
             delay,
@@ -72,7 +72,9 @@ function App() {
             setCount(0);
           });
         }}
-      ></Button>
+      >
+        Send Message
+      </Button>
     </div>
   );
 }
