@@ -11,7 +11,7 @@ enum Command {
 
 function App() {
   const [message, setMessage] = useState('');
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(1);
   const [delay, setDelay] = useState(0);
   const [command, setCommand] = useState<Command | null>(null);
 
@@ -69,7 +69,7 @@ function App() {
 
           p.then(() => {
             setMessage('');
-            setCount(0);
+            setCount(1);
           });
         }}
       >
