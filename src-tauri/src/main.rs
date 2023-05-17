@@ -34,11 +34,12 @@ fn send_message(message: &str, username: &str, count: usize, delay: u64) {
             }
         };
 
+        println!("Sending message");
         faker::MESSAGES
             .lock()
             .push_back((message.to_string(), user.clone()));
 
-        std::thread::sleep(std::time::Duration::from_millis(delay));
+        // std::thread::sleep(std::time::Duration::from_millis(delay));
     }
 }
 
