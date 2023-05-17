@@ -39,17 +39,16 @@ impl Actor for FakeIrc {
             let mut rng = rand::thread_rng();
 
             // Iterate over all possible messages at once, rather than waiting a second to send the next one
-            while let Some((msg, user)) = faker::MESSAGES.lock().pop_front() {
+            while let Some((msg, user, delay)) = faker::MESSAGES.lock().pop_front() {
+                println!("Found a message");
                 // Skip any comments or empty lines
                 if msg.starts_with('#') || msg.is_empty() {
                     return;
                 }
 
-                let millis: u64 = rng.gen_range(50..1500);
+                debug!("Sleeping for {} milliseconds", delay.as_millis());
 
-                debug!("Sleeping for {} milliseconds", millis);
-
-                thread::sleep(Duration::from_millis(millis));
+                thread::sleep(delay);
 
                 debug!("Sending message");
 
@@ -75,6 +74,7 @@ impl Actor for FakeIrc {
 
                 debug!("Message sent");
             }
+            println!("Done sending messages");
         });
     }
 }

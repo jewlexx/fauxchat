@@ -4,6 +4,7 @@
 use std::{
     collections::VecDeque,
     net::{Ipv4Addr, SocketAddrV4},
+    time::Duration,
 };
 
 use once_cell::sync::Lazy;
@@ -15,7 +16,7 @@ pub use usergen;
 
 pub use twitch_api::USERS;
 
-pub static MESSAGES: Lazy<Mutex<VecDeque<(String, twitch_api::TwitchUser)>>> =
+pub static MESSAGES: Lazy<Mutex<VecDeque<(String, twitch_api::TwitchUser, Duration)>>> =
     Lazy::new(|| Mutex::new(VecDeque::new()));
 
 #[must_use]

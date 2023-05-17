@@ -3,7 +3,7 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::path::PathBuf;
+use std::{path::PathBuf, time::Duration};
 
 use actix_web::{web, App, HttpServer};
 use tokio::{fs::File, io::AsyncReadExt};
@@ -35,9 +35,11 @@ fn send_message(message: &str, username: &str, count: usize, delay: u64) {
         };
 
         println!("Sending message");
-        faker::MESSAGES
-            .lock()
-            .push_back((message.to_string(), user.clone()));
+        faker::MESSAGES.lock().push_back((
+            message.to_string(),
+            user.clone(),
+            Duration::from_millis(delay),
+        ));
 
         // std::thread::sleep(std::time::Duration::from_millis(delay));
     }
