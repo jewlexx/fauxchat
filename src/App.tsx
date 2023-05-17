@@ -48,7 +48,7 @@ function App() {
       <Input
         type="number"
         placeholder="Delay"
-        value={count}
+        value={delay}
         onChange={(e) => setDelay(parseInt(e.target.value, 10))}
       />
 
