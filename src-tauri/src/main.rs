@@ -49,7 +49,7 @@ fn send_message(message: &str, username: &str, count: usize, delay: u64) {
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_span_events(FmtSpan::FULL)
-        .with_max_level(tracing::Level::INFO)
+        .with_max_level(tracing::Level::DEBUG)
         .init();
 
     Credentials::init().await?;
@@ -66,14 +66,14 @@ async fn main() -> anyhow::Result<()> {
         faker::twitch_api::UserPool::get().await?
     };
 
-    println!("Created pool");
+    trace!("Created pool");
 
     *faker::USERS.lock() = pool;
 
-    println!("Assigned users");
+    trace!("Assigned users");
 
     let fut = HttpServer::new(|| {
-        println!("Creating app");
+        trace!("Creating app");
         App::new()
             .service(routes::twitch)
             .service(routes::credentials)
@@ -87,12 +87,12 @@ async fn main() -> anyhow::Result<()> {
         fut.await.expect("valid running of http server");
     });
 
-    println!("Running app");
+    trace!("Running app");
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![greet, send_message])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-    println!("App closed");
+    trace!("App closed");
 
     // Close the server when the app is closed
     server_thread.abort();
