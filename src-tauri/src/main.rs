@@ -41,19 +41,17 @@ fn invoke_command(command: &str, username: Option<&str>) {
 
 #[tauri::command]
 fn send_message(message: &str, username: &str, count: usize, delay: u64) {
-    for _ in 0..count {
-        println!("Sending message");
+    println!("Sending message");
 
-        let command = commands::Command::Send {
-            message: message.to_string(),
-            count,
-            delay,
-        };
+    let command = commands::Command::Send {
+        message: message.to_string(),
+        count,
+        delay,
+    };
 
-        faker::MESSAGES
-            .lock()
-            .push_back((command, username.to_string()));
-    }
+    faker::MESSAGES
+        .lock()
+        .push_back((command, username.to_string()));
 }
 
 #[tokio::main]
