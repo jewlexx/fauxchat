@@ -36,9 +36,7 @@ fn invoke_command(command: &str, username: Option<&str>) {
 
     let mut messages = faker::MESSAGES.lock();
 
-    for _ in 0..parsed.get_count() {
-        messages.push_back((parsed.clone(), username.clone()));
-    }
+    messages.push_back((parsed, username));
 }
 
 #[tauri::command]
