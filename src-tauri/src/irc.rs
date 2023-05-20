@@ -4,9 +4,7 @@ use actix::{prelude::*, Actor, AsyncContext, StreamHandler};
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
-use rand::Rng;
-
-use faker::commands::Command;
+use faker::{commands::Command, twitch_api::TwitchUser};
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
 pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
@@ -36,15 +34,12 @@ impl Actor for FakeIrc {
         ctx.run_interval(Duration::from_secs(1), move |_, ctx| {
             debug!("Sending message");
 
-            let mut rng = rand::thread_rng();
-
             // Iterate over all possible messages at once, rather than waiting a second to send the next one
-            while let Some((msg, user, delay)) = faker::MESSAGES.lock().pop_front() {
+            while let Some((cmd, username)) = faker::MESSAGES.lock().pop_front() {
                 println!("Found a message");
                 // Skip any comments or empty lines
-                if msg.starts_with('#') || msg.is_empty() {
-                    return;
-                }
+
+                let delay = cmd.get_delay();
 
                 debug!("Sleeping for {} milliseconds", delay.as_millis());
 
@@ -52,24 +47,32 @@ impl Actor for FakeIrc {
 
                 debug!("Sending message");
 
-                debug!("{}", msg);
+                debug!("{:?}", cmd);
 
-                let parsed = Command::try_from(msg).unwrap();
-
-                match parsed {
-                    Command::Send(ref message, count) => {
+                match cmd {
+                    Command::Send {
+                        ref message,
+                        count,
+                        delay: _,
+                    } => {
                         for _ in 0..count {
+                            let user = {
+                                if username == "random" {
+                                    TwitchUser::random()
+                                } else {
+                                    TwitchUser::from_username(&username)
+                                }
+                            };
+
                             let parsed = user.send_message(message);
                             ctx.text(parsed);
 
-                            let millis: u64 = rng.gen_range(50..1500);
+                            debug!("Sleeping for {} milliseconds", delay.as_millis());
 
-                            debug!("Sleeping for {} milliseconds", millis);
-
-                            thread::sleep(Duration::from_millis(millis));
+                            thread::sleep(delay);
                         }
                     }
-                    Command::Sleep(millis) => thread::sleep(Duration::from_millis(millis)),
+                    Command::Sleep { delay: _ } => thread::sleep(delay),
                 }
 
                 debug!("Message sent");

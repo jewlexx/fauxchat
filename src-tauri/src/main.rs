@@ -3,13 +3,16 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::{path::PathBuf, time::Duration};
+use std::{path::PathBuf};
 
 use actix_web::{web, App, HttpServer};
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use faker::twitch_api::{creds::Credentials, TwitchUser};
+use faker::{
+    commands,
+    twitch_api::{creds::Credentials},
+};
 
 mod irc;
 mod routes;
@@ -24,24 +27,24 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
+fn invoke_command(command: &str, username: &str) {
+    info!("Invoking command: {}", command);
+}
+
+#[tauri::command]
 fn send_message(message: &str, username: &str, count: usize, delay: u64) {
     for _ in 0..count {
-        let user = {
-            if username == "random" {
-                TwitchUser::random()
-            } else {
-                TwitchUser::from_username(username)
-            }
+        println!("Sending message");
+
+        let command = commands::Command::Send {
+            message: message.to_string(),
+            count,
+            delay,
         };
 
-        println!("Sending message");
-        faker::MESSAGES.lock().push_back((
-            message.to_string(),
-            user.clone(),
-            Duration::from_millis(delay),
-        ));
-
-        // std::thread::sleep(std::time::Duration::from_millis(delay));
+        faker::MESSAGES
+            .lock()
+            .push_back((command, username.to_string()));
     }
 }
 
@@ -89,7 +92,11 @@ async fn main() -> anyhow::Result<()> {
 
     trace!("Running app");
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, send_message])
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            send_message,
+            invoke_command
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     trace!("App closed");

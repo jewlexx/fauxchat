@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use actix_web::{HttpRequest, HttpResponse, Result};
+use actix_web::{HttpRequest, HttpResponse};
 use include_dir::{include_dir, Dir};
 
 static CHAT_DIR: Dir<'_> = include_dir!("chat");
