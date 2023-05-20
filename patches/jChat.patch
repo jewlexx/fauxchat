@@ -2201,16 +2201,13 @@ index e333d72..0000000
 -});
 \ No newline at end of file
 diff --git a/v2/script.js b/v2/script.js
-index 8b69758..4439ebf 100644
+index 8b69758..3548beb 100644
 --- a/v2/script.js
 +++ b/v2/script.js
-@@ -1,558 +1,871 @@
+@@ -1,558 +1,868 @@
 -(function($) { // Thanks to BrunoLM (https://stackoverflow.com/a/3855394)
 -    $.QueryString = (function(paramsArray) {
 -        let params = {};
-+const URL = '127.0.0.1';
-+const PORT = '8080';
-+
 +const fonts = [
 +  'BalooTammudu',
 +  'SegoeUI',

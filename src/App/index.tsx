@@ -21,7 +21,20 @@ function App() {
         onChange={(e) => setCommand(e.target.value)}
       ></Input>
 
-      <Button onClick={() => {}} style={{ gridArea: 'e' }}>
+      <Button
+        onClick={() => {
+          const oldCommand = command;
+
+          const p = invoke('invoke_command', { command });
+          p.then((_) => {
+            // Only reset if the user has not updated the command
+            if (oldCommand === command) {
+              setCommand('');
+            }
+          });
+        }}
+        style={{ gridArea: 'e' }}
+      >
         Send Command
       </Button>
     </div>

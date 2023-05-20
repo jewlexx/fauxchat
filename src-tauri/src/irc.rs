@@ -77,7 +77,7 @@ impl Actor for FakeIrc {
 
                 debug!("Message sent");
             }
-            println!("Done sending messages");
+            debug!("Done sending messages");
         });
     }
 }
