@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.71"
-openai = { version = "1.0.0-alpha.8", features = ["reqwest"] }
+openai = { version = "1.0.0-alpha.9", features = ["reqwest"] }
 rand = "0.8.5"
 serde = "1.0.163"
 
