@@ -3,15 +3,15 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::{path::PathBuf};
+use std::path::PathBuf;
 
 use actix_web::{web, App, HttpServer};
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
 use faker::{
-    commands,
-    twitch_api::{creds::Credentials},
+    commands::{self, Command},
+    twitch_api::creds::Credentials,
 };
 
 mod irc;
@@ -27,8 +27,18 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn invoke_command(command: &str, username: &str) {
+fn invoke_command(command: &str, username: Option<&str>) {
     info!("Invoking command: {}", command);
+
+    let username = username.unwrap_or("random").to_string();
+
+    let parsed = Command::try_from(command.to_string()).expect("valid command");
+
+    let mut messages = faker::MESSAGES.lock();
+
+    for _ in 0..parsed.get_count() {
+        messages.push_back((parsed.clone(), username.clone()));
+    }
 }
 
 #[tauri::command]

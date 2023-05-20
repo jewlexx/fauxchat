@@ -3,6 +3,7 @@
 
 use std::{num::ParseIntError, time::Duration};
 
+use grammar::CommandsParser;
 use thiserror::Error;
 
 #[macro_use]
@@ -84,5 +85,21 @@ impl Command {
         };
 
         Duration::from_millis(delay_ms)
+    }
+
+    #[must_use]
+    pub fn get_count(&self) -> usize {
+        match self {
+            Command::Send { count, .. } => *count,
+            Command::Sleep { .. } => 1,
+        }
+    }
+}
+
+impl TryFrom<String> for Command {
+    type Error = anyhow::Error;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        CommandsParser::parse_single(&value)
     }
 }
