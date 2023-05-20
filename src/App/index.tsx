@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Input, Select, Option, Button } from '@mui/joy';
 import { invoke } from '@tauri-apps/api/tauri';
-import Chat from './Chat';
-import styles from './App.module.scss';
+import Chat from '../Chat';
+import styles from './index.module.scss';
 
 enum Command {
   Send,
@@ -25,17 +25,23 @@ function App() {
         placeholder="Choose command"
         value={command}
         onChange={(_, newValue) => setCommand(newValue)}
+        style={{ gridArea: 'b' }}
       >
         <Option value={Command.Send}>Send</Option>
         <Option value={Command.Sleep}>Sleep</Option>
       </Select>
       {command === Command.Send && (
-        <Input value={message} onChange={(e) => setMessage(e.target.value)} />
+        <Input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          style={{ gridArea: 'c' }}
+        />
       )}
       <Input
         type="number"
         value={count}
         onChange={(e) => setCount(parseInt(e.target.value, 10))}
+        style={{ gridArea: 'd' }}
       />
 
       <Button
@@ -46,6 +52,7 @@ function App() {
             message: 'too lazy to implement',
           };
         }}
+        style={{ gridArea: 'e' }}
       ></Button>
     </div>
   );

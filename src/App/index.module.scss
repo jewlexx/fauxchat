@@ -1,0 +1,15 @@
+.container {
+  margin: 0;
+  display: grid;
+  grid-template-areas:
+    'a b'
+    '. c'
+    '. d'
+    '. e';
+
+  // Change the height of column 1 without affecting the height of column 2
+
+  :first-child {
+    grid-area: 'a';
+  }
+}
