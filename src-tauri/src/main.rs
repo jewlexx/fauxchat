@@ -3,7 +3,7 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::path::PathBuf;
+use std::{path::PathBuf, time::Duration};
 
 use actix_web::{web, App, HttpServer};
 use tokio::{fs::File, io::AsyncReadExt};
@@ -24,21 +24,32 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn send_message(message: &str, username: &str, count: usize) {
+fn send_message(message: &str, username: &str, count: usize, delay: u64) {
     for _ in 0..count {
-        faker::MESSAGES
-            .lock()
-            .push_back((message.to_string(), TwitchUser::from_username(username)));
+        let user = {
+            if username == "random" {
+                TwitchUser::random()
+            } else {
+                TwitchUser::from_username(username)
+            }
+        };
+
+        println!("Sending message");
+        faker::MESSAGES.lock().push_back((
+            message.to_string(),
+            user.clone(),
+            Duration::from_millis(delay),
+        ));
+
+        // std::thread::sleep(std::time::Duration::from_millis(delay));
     }
 }
-
-// TODO: In release builds, include all files from chat frontend in binary
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_span_events(FmtSpan::FULL)
-        .with_max_level(tracing::Level::INFO)
+        .with_max_level(tracing::Level::DEBUG)
         .init();
 
     Credentials::init().await?;
@@ -55,14 +66,14 @@ async fn main() -> anyhow::Result<()> {
         faker::twitch_api::UserPool::get().await?
     };
 
-    println!("Created pool");
+    trace!("Created pool");
 
     *faker::USERS.lock() = pool;
 
-    println!("Assigned users");
+    trace!("Assigned users");
 
     let fut = HttpServer::new(|| {
-        println!("Creating app");
+        trace!("Creating app");
         App::new()
             .service(routes::twitch)
             .service(routes::credentials)
@@ -76,12 +87,12 @@ async fn main() -> anyhow::Result<()> {
         fut.await.expect("valid running of http server");
     });
 
-    println!("Running app");
+    trace!("Running app");
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![greet, send_message])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-    println!("App closed");
+    trace!("App closed");
 
     // Close the server when the app is closed
     server_thread.abort();
