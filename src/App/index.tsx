@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Input, Select, Option, Button } from '@mui/joy';
 import { invoke } from '@tauri-apps/api/tauri';
 import Chat from '../Chat';
@@ -6,6 +6,7 @@ import styles from './index.module.scss';
 
 function App() {
   const [command, setCommand] = useState('');
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div className={styles.container}>
@@ -18,11 +19,17 @@ function App() {
       <Input
         placeholder="Enter command"
         value={command}
+        onKeyDown={(key) => {
+          if (key.key === 'Enter') {
+            btnRef.current?.click();
+          }
+        }}
         onChange={(e) => setCommand(e.target.value)}
         style={{ gridArea: 'b' }}
       ></Input>
 
       <Button
+        ref={btnRef}
         onClick={() => {
           const oldCommand = command;
 
