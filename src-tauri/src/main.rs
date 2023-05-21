@@ -6,43 +6,64 @@
 use std::path::PathBuf;
 
 use actix_web::{web, App, HttpServer};
+use crossbeam::channel::{unbounded, Sender};
+use once_cell::sync::OnceCell;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use faker::twitch_api::{creds::Credentials, TwitchUser};
+use commands::Command;
+use twitch_api::creds::Credentials;
 
 mod irc;
+mod net;
 mod routes;
 
 #[macro_use]
 extern crate tracing;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {name}! You've been greeted from Rust!")
+static mut TX: OnceCell<Sender<irc::SingleCommand>> = OnceCell::new();
+
+fn ready_message(msg: irc::SingleCommand) {
+    let tx = unsafe { TX.wait() };
+
+    tx.send(msg).expect("connected channel. receiver dropped?");
 }
 
 #[tauri::command]
-fn send_message(message: &str, username: &str) {
-    faker::MESSAGES
-        .lock()
-        .push_back((message.to_string(), TwitchUser::from_username(username)));
+fn invoke_command(command: &str, username: Option<&str>) {
+    info!("Invoking command: {}", command);
+
+    let username = username.unwrap_or("random").to_string();
+
+    let parsed = Command::try_from(command.to_string()).expect("valid command");
+
+    ready_message((parsed, username));
 }
 
-// TODO: In release builds, include all files from chat frontend in binary
+#[tauri::command]
+fn send_message(message: &str, username: &str, count: usize, delay: u64) {
+    info!("Sending message");
+
+    let command = Command::Send {
+        message: message.to_string(),
+        count,
+        delay,
+    };
+
+    ready_message((command, username.to_string()));
+}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_span_events(FmtSpan::FULL)
-        .with_max_level(tracing::Level::INFO)
+        .with_max_level(tracing::Level::DEBUG)
         .init();
 
     Credentials::init().await?;
 
     // Must be initialized after credentials
-    once_cell::sync::Lazy::force(&faker::twitch_api::CLIENT);
+    once_cell::sync::Lazy::force(&twitch_api::CLIENT);
 
     let pool = if PathBuf::from("../pool.json").exists() {
         let mut file = File::open("../pool.json").await?;
@@ -50,23 +71,23 @@ async fn main() -> anyhow::Result<()> {
         file.read_to_string(&mut file_str).await?;
         serde_json::from_str(&file_str)?
     } else {
-        faker::twitch_api::UserPool::get().await?
+        twitch_api::UserPool::get().await?
     };
 
-    println!("Created pool");
+    trace!("Created pool");
 
-    *faker::USERS.lock() = pool;
+    *twitch_api::USERS.lock() = pool;
 
-    println!("Assigned users");
+    trace!("Assigned users");
 
     let fut = HttpServer::new(|| {
-        println!("Creating app");
+        trace!("Creating app");
         App::new()
             .service(routes::twitch)
             .service(routes::credentials)
             .route("/ws/", web::get().to(irc::handle_ws))
     })
-    .bind(faker::addr())
+    .bind(net::addr())
     .expect("valid url and successful binding")
     .run();
 
@@ -74,15 +95,28 @@ async fn main() -> anyhow::Result<()> {
         fut.await.expect("valid running of http server");
     });
 
-    println!("Running app");
+    let (tx, rx) = unbounded();
+
+    unsafe { TX.set(tx) }.unwrap();
+
+    let messages_thread = tokio::spawn(async move {
+        irc::send_messages(&rx);
+    });
+
+    trace!("Running app");
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, send_message])
+        .invoke_handler(tauri::generate_handler![send_message, invoke_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-    println!("App closed");
+    trace!("App closed");
 
     // Close the server when the app is closed
     server_thread.abort();
+
+    // Drop the sender, thus closing the channel
+    unsafe { TX.take() };
+    // Thread will be completed, as we closed the connection
+    messages_thread.await?;
 
     Ok(())
 }

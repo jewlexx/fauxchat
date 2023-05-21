@@ -1,3 +1,6 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
+
 use openai::{completions::Completion, set_key};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
@@ -34,6 +37,7 @@ pub struct Color {
 }
 
 impl Color {
+    #[must_use]
     pub fn generate() -> Self {
         let mut rng = rand::thread_rng();
 
@@ -44,6 +48,7 @@ impl Color {
         }
     }
 
+    #[must_use]
     pub fn generate_light() -> Self {
         let mut color = Self::generate();
 
@@ -55,11 +60,12 @@ impl Color {
         color
     }
 
+    #[must_use]
     pub fn is_light(&self) -> bool {
         let (r, g, b) = {
-            let r = self.r as f32;
-            let g = self.g as f32;
-            let b = self.b as f32;
+            let r = f32::from(self.r);
+            let g = f32::from(self.g);
+            let b = f32::from(self.b);
 
             (r, g, b)
         };
@@ -87,7 +93,7 @@ mod tests {
     async fn test_generate_names() -> anyhow::Result<()> {
         let names = generate_names::<4>().await?;
         for name in names {
-            assert!(!name.is_empty())
+            assert!(!name.is_empty());
         }
 
         Ok(())

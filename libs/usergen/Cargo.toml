@@ -2,14 +2,16 @@
 name = "usergen"
 version = "0.1.0"
 edition = "2021"
+license = "MIT AND Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.71"
 openai = { version = "1.0.0-alpha.9", features = ["reqwest"] }
-rand = "0.8.5"
-serde = "1.0.163"
+
+serde = { workspace = true }
+rand = { workspace = true }
+anyhow = { workspace = true }
 
 [dev-dependencies]
-tokio = { version = "1.28.1", features = ["full"] }
+tokio = { workspace = true }

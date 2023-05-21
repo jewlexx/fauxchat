@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use actix_web::{HttpRequest, HttpResponse, Result};
+use actix_web::{HttpRequest, HttpResponse};
 use include_dir::{include_dir, Dir};
 
 static CHAT_DIR: Dir<'_> = include_dir!("chat");
@@ -51,7 +51,7 @@ async fn twitch(req: HttpRequest) -> HttpResponse {
 const URL = '127.0.0.1';
 const PORT = '{}';
 // End injected section\n",
-                    faker::port()
+                    crate::net::port()
                 );
 
                 contents.extend(prefix.as_bytes());
@@ -75,8 +75,8 @@ const PORT = '{}';
 
 #[allow(clippy::unused_async)]
 #[actix_web::get("/credentials.js")]
-async fn credentials() -> Result<String> {
-    let creds = faker::twitch_api::creds::Credentials::read();
+async fn credentials() -> HttpResponse {
+    let creds = twitch_api::creds::Credentials::read();
 
     let client_id = creds.client_id;
     let api_token = creds.auth_token;
@@ -88,5 +88,7 @@ const credentials = "{api_token}";
         "#
     );
 
-    Ok(file)
+    HttpResponse::Ok()
+        .content_type("application/javascript")
+        .body(file)
 }

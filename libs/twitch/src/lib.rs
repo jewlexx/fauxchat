@@ -1,3 +1,6 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
+
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 use rand::seq::SliceRandom;
@@ -72,7 +75,12 @@ pub struct TwitchUser {
 }
 
 impl TwitchUser {
-    // Please ensure that user pool is initialized before calling this function
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        let users = &crate::USERS.lock().users;
+        users.choose(&mut rng).unwrap().clone()
+    }
+
     pub fn from_username(username: impl AsRef<str>) -> Self {
         let username = username.as_ref();
 
