@@ -19,6 +19,7 @@ function App() {
         placeholder="Enter command"
         value={command}
         onChange={(e) => setCommand(e.target.value)}
+        style={{ gridArea: 'b' }}
       ></Input>
 
       <Button
@@ -33,7 +34,7 @@ function App() {
             }
           });
         }}
-        style={{ gridArea: 'e' }}
+        style={{ gridArea: 'c' }}
       >
         Send Command
       </Button>

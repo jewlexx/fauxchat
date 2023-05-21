@@ -8,18 +8,19 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <Global
       styles={css`
         html,
-        body {
-          margin: none;
-          padding: none;
+        body,
+        #root {
+          margin: 0;
+          padding: 0;
           width: 100vw;
           height: 100vh;
         }
 
         :root {
           font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-          // font-size: 16px;
-          // line-height: 24px;
-          // font-weight: 400;
+          font-size: 16px;
+          line-height: 24px;
+          font-weight: 400;
 
           color: #0f0f0f;
           background-color: #f6f6f6;
