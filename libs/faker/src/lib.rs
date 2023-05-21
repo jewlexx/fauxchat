@@ -1,22 +1,13 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::{
-    collections::VecDeque,
-    net::{Ipv4Addr, SocketAddrV4},
-};
-
-use once_cell::sync::Lazy;
-use parking_lot::Mutex;
+use std::net::{Ipv4Addr, SocketAddrV4};
 
 pub use commands;
 pub use twitch_api;
 pub use usergen;
 
 pub use twitch_api::USERS;
-
-pub static MESSAGES: Lazy<Mutex<VecDeque<(commands::Command, String)>>> =
-    Lazy::new(|| Mutex::new(VecDeque::new()));
 
 #[must_use]
 pub const fn url() -> Ipv4Addr {
