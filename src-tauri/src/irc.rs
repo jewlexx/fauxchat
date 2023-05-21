@@ -4,7 +4,8 @@ use actix::{prelude::*, Actor, AsyncContext, StreamHandler};
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
-use faker::{commands::Command, twitch_api::TwitchUser, MESSAGES};
+use crossbeam::channel::Receiver;
+use faker::{commands::Command, twitch_api::TwitchUser};
 use parking_lot::Mutex;
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
@@ -13,15 +14,17 @@ pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpRes
     dbg!(resp)
 }
 
+pub type SingleCommand = (Command, String);
+
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
-pub fn send_messages() {
+pub fn send_messages(receiver: &Receiver<SingleCommand>) {
     let conns = RECIPIENTS.lock().len();
     debug!("{conns} connections");
     debug!("Sending message");
 
-    // Iterate over all possible messages at once, rather than waiting a second to send the next one
-    while let Some((cmd, username)) = MESSAGES.lock().pop_front() {
+    // While loop will exit once connection is closed
+    while let Ok((cmd, username)) = receiver.recv() {
         println!("Found a message");
         // Skip any comments or empty lines
 

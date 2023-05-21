@@ -3,9 +3,11 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::{path::PathBuf, time::Duration};
+use std::path::PathBuf;
 
 use actix_web::{web, App, HttpServer};
+use crossbeam::channel::{unbounded, Sender};
+use once_cell::sync::OnceCell;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
@@ -20,6 +22,14 @@ mod routes;
 #[macro_use]
 extern crate tracing;
 
+static mut TX: OnceCell<Sender<irc::SingleCommand>> = OnceCell::new();
+
+fn ready_message(msg: irc::SingleCommand) {
+    let tx = unsafe { TX.wait() };
+
+    tx.send(msg).expect("connected channel. receiver dropped?");
+}
+
 #[tauri::command]
 fn invoke_command(command: &str, username: Option<&str>) {
     info!("Invoking command: {}", command);
@@ -28,14 +38,12 @@ fn invoke_command(command: &str, username: Option<&str>) {
 
     let parsed = Command::try_from(command.to_string()).expect("valid command");
 
-    let mut messages = faker::MESSAGES.lock();
-
-    messages.push_back((parsed, username));
+    ready_message((parsed, username));
 }
 
 #[tauri::command]
 fn send_message(message: &str, username: &str, count: usize, delay: u64) {
-    println!("Sending message");
+    info!("Sending message");
 
     let command = commands::Command::Send {
         message: message.to_string(),
@@ -43,9 +51,7 @@ fn send_message(message: &str, username: &str, count: usize, delay: u64) {
         delay,
     };
 
-    faker::MESSAGES
-        .lock()
-        .push_back((command, username.to_string()));
+    ready_message((command, username.to_string()));
 }
 
 #[tokio::main]
@@ -90,13 +96,12 @@ async fn main() -> anyhow::Result<()> {
         fut.await.expect("valid running of http server");
     });
 
-    let messages_thread = tokio::spawn(async {
-        let mut interval = tokio::time::interval(Duration::from_millis(1000));
+    let (tx, rx) = unbounded();
 
-        loop {
-            interval.tick().await;
-            irc::send_messages();
-        }
+    unsafe { TX.set(tx) }.unwrap();
+
+    let messages_thread = tokio::spawn(async move {
+        irc::send_messages(&rx);
     });
 
     trace!("Running app");
@@ -108,7 +113,11 @@ async fn main() -> anyhow::Result<()> {
 
     // Close the server when the app is closed
     server_thread.abort();
-    messages_thread.abort();
+
+    // Drop the sender, thus closing the channel
+    unsafe { TX.take() };
+    // Thread will be completed, as we closed the connection
+    messages_thread.await?;
 
     Ok(())
 }

@@ -36,6 +36,7 @@ faker = { path = "../libs/faker" }
 include_dir = "0.7.3"
 once_cell = { version = "1.17.1", features = ["parking_lot"] }
 parking_lot = "0.12.1"
+crossbeam = { version = "0.8.2", features = ["crossbeam-channel"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
