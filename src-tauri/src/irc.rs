@@ -4,9 +4,10 @@ use actix::{prelude::*, Actor, AsyncContext, StreamHandler};
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
+use commands::Command;
 use crossbeam::channel::Receiver;
-use faker::{commands::Command, twitch_api::TwitchUser};
 use parking_lot::Mutex;
+use twitch_api::TwitchUser;
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
 pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {

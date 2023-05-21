@@ -3,12 +3,6 @@
 
 use std::net::{Ipv4Addr, SocketAddrV4};
 
-pub use commands;
-pub use twitch_api;
-pub use usergen;
-
-pub use twitch_api::USERS;
-
 #[must_use]
 pub const fn url() -> Ipv4Addr {
     Ipv4Addr::new(127, 0, 0, 1)

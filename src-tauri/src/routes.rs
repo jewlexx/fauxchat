@@ -76,7 +76,7 @@ const PORT = '{}';
 #[allow(clippy::unused_async)]
 #[actix_web::get("/credentials.js")]
 async fn credentials() -> HttpResponse {
-    let creds = faker::twitch_api::creds::Credentials::read();
+    let creds = twitch_api::creds::Credentials::read();
 
     let client_id = creds.client_id;
     let api_token = creds.auth_token;

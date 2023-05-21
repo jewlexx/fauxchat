@@ -321,6 +321,7 @@ dependencies = [
  "actix-web",
  "actix-web-actors",
  "anyhow",
+ "commands",
  "crossbeam",
  "faker",
  "include_dir",
@@ -333,11 +334,12 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
- "thiserror",
  "tokio",
  "toml 0.7.3",
  "tracing",
  "tracing-subscriber",
+ "twitch_api",
+ "usergen",
 ]
 
 [[package]]
@@ -1155,23 +1157,6 @@ dependencies = [
 [[package]]
 name = "faker"
 version = "0.1.0"
-dependencies = [
- "anyhow",
- "commands",
- "once_cell",
- "parking_lot",
- "rand 0.8.5",
- "rayon",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
- "toml 0.7.3",
- "tracing",
- "twitch_api",
- "usergen",
-]
 
 [[package]]
 name = "fastrand"

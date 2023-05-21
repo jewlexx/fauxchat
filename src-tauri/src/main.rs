@@ -11,10 +11,8 @@ use once_cell::sync::OnceCell;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use faker::{
-    commands::{self, Command},
-    twitch_api::creds::Credentials,
-};
+use commands::Command;
+use twitch_api::creds::Credentials;
 
 mod irc;
 mod routes;
@@ -45,7 +43,7 @@ fn invoke_command(command: &str, username: Option<&str>) {
 fn send_message(message: &str, username: &str, count: usize, delay: u64) {
     info!("Sending message");
 
-    let command = commands::Command::Send {
+    let command = Command::Send {
         message: message.to_string(),
         count,
         delay,
@@ -64,7 +62,7 @@ async fn main() -> anyhow::Result<()> {
     Credentials::init().await?;
 
     // Must be initialized after credentials
-    once_cell::sync::Lazy::force(&faker::twitch_api::CLIENT);
+    once_cell::sync::Lazy::force(&twitch_api::CLIENT);
 
     let pool = if PathBuf::from("../pool.json").exists() {
         let mut file = File::open("../pool.json").await?;
@@ -72,12 +70,12 @@ async fn main() -> anyhow::Result<()> {
         file.read_to_string(&mut file_str).await?;
         serde_json::from_str(&file_str)?
     } else {
-        faker::twitch_api::UserPool::get().await?
+        twitch_api::UserPool::get().await?
     };
 
     trace!("Created pool");
 
-    *faker::USERS.lock() = pool;
+    *twitch_api::USERS.lock() = pool;
 
     trace!("Assigned users");
 
