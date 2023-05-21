@@ -5,6 +5,10 @@ use pest::Parser;
 pub struct CommandsParser;
 
 impl CommandsParser {
+    /// Parses a single command.
+    ///
+    /// # Panics
+    /// - Will panic if the input is invalid.
     pub fn parse_single(input: &str) -> anyhow::Result<super::Command> {
         let mut ast = CommandsParser::parse(Rule::command_single, input)?;
 
