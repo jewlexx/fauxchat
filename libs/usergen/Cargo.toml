@@ -8,8 +8,8 @@ license = "MIT AND Apache-2.0"
 
 [dependencies]
 openai = { version = "1.0.0-alpha.9", features = ["reqwest"] }
-serde = "1.0.163"
 
+serde = { workspace = true }
 rand = { workspace = true }
 anyhow = { workspace = true }
 
