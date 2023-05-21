@@ -11,8 +11,7 @@ use tracing_subscriber::fmt::format::FmtSpan;
 
 use faker::{
     commands::{self, Command},
-    twitch_api::{creds::Credentials, TwitchUser},
-    MESSAGES,
+    twitch_api::creds::Credentials,
 };
 
 mod irc;

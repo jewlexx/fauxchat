@@ -1,48 +1,16 @@
-use std::{collections::VecDeque, thread};
+use std::thread;
 
 use actix::{prelude::*, Actor, AsyncContext, StreamHandler};
 use actix_web::{web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
 use faker::{commands::Command, twitch_api::TwitchUser, MESSAGES};
-use once_cell::sync::Lazy;
 use parking_lot::Mutex;
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
 pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
     let resp = ws::start(FakeIrc, &req, stream);
     dbg!(resp)
-}
-
-pub type Messages = VecDeque<(Command, String)>;
-
-static UNSENT_MESSAGES: Lazy<Mutex<(Messages, usize)>> =
-    Lazy::new(|| Mutex::new((VecDeque::new(), 0)));
-
-/// Load unsent messages, updating the access
-fn load_unsent(max_access: usize) -> Messages {
-    let mut msgs = UNSENT_MESSAGES.lock();
-    debug!("Loaded messages");
-
-    let access = &mut msgs.1;
-
-    if max_access == 0 {
-        VecDeque::new()
-    } else if *access >= max_access.saturating_sub(1) {
-        *access = 0;
-        debug!("Recursed unsent messages (should only happen once)");
-        // Ensure lock is dropped so recursion works
-        drop(msgs);
-        load_unsent(max_access)
-    } else {
-        *access += 1;
-
-        while let Some(message) = faker::MESSAGES.lock().pop_front() {
-            msgs.0.push_back(message);
-        }
-
-        msgs.0.clone()
-    }
 }
 
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
