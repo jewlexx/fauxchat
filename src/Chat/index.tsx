@@ -1,8 +1,7 @@
 import { type FunctionComponent } from 'react';
-import { Card } from '@mui/joy';
+import { Card, CardContent } from '@mui/material';
 import Iframe from 'react-iframe';
-import { invoke } from '@tauri-apps/api/tauri';
-import './index.scss';
+import styles from './index.module.scss';
 
 interface Props {
   port: string;
@@ -12,8 +11,8 @@ interface Props {
 
 const Chat: FunctionComponent<Props> = ({ port, url = '127.0.0.1', path }) => {
   return (
-    <Card>
-      <Iframe url={`http://${url}:${port}${path}`} frameBorder={0} />
+    <Card sx={{ marginBottom: '1rem' }}>
+      <Iframe url={`http://${url}:${port}${path}`} className={styles.frame} />
     </Card>
   );
 };
