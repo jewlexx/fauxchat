@@ -70,7 +70,12 @@ impl Command {
                 delay: parts[1].parse()?,
             }),
             "send" => Ok(Command::Send {
-                message: parts[1].to_string(),
+                message: {
+                    let arg = parts[1].to_string();
+                    let lit = litrs::StringLit::parse(arg.as_str()).expect("valid string literal");
+                    let value = lit.value();
+                    value.to_string()
+                },
                 count: parts[2].parse()?,
                 delay: parts[3].parse()?,
             }),

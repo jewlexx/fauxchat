@@ -131,12 +131,19 @@ mod tests {
     use super::*;
     use crate::Command;
 
-    const MESSAGES: &str = include_str!("../../../messages.txt");
-
     #[test]
     fn test_parse() {
         // Send "Message Here" 10 times with 10 milliseconds in between each
-        CommandsParser::parse_single("send(\"Message Here\", 10, 10)").unwrap();
+        let command = CommandsParser::parse_single("send(\"Message Here\", 10, 10)").unwrap();
+        let act = Command::Send {
+            message: String::from("Message Here"),
+            count: 10,
+            delay: 10,
+        };
+
+        assert_eq!(command, act);
+
+        // const MESSAGES: &str = include_str!("../../../messages.txt");
 
         // let commands = CommandsParser::commands(MESSAGES).unwrap();
         // let mut commands_iter = commands.iter();
