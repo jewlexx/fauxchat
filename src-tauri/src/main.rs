@@ -3,7 +3,7 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::path::PathBuf;
+use std::{path::PathBuf, time::Duration};
 
 use actix_web::{web, App, HttpServer};
 use tokio::{fs::File, io::AsyncReadExt};
@@ -11,7 +11,8 @@ use tracing_subscriber::fmt::format::FmtSpan;
 
 use faker::{
     commands::{self, Command},
-    twitch_api::creds::Credentials,
+    twitch_api::{creds::Credentials, TwitchUser},
+    MESSAGES,
 };
 
 mod irc;
@@ -90,6 +91,15 @@ async fn main() -> anyhow::Result<()> {
         fut.await.expect("valid running of http server");
     });
 
+    let messages_thread = tokio::spawn(async {
+        let mut interval = tokio::time::interval(Duration::from_millis(1000));
+
+        loop {
+            interval.tick().await;
+            irc::send_messages();
+        }
+    });
+
     trace!("Running app");
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![send_message, invoke_command])
@@ -99,6 +109,7 @@ async fn main() -> anyhow::Result<()> {
 
     // Close the server when the app is closed
     server_thread.abort();
+    messages_thread.abort();
 
     Ok(())
 }
