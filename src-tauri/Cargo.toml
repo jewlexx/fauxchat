@@ -33,7 +33,6 @@ parking_lot = { workspace = true }
 anyhow = { workspace = true }
 rand = { workspace = true }
 
-faker = { path = "../libs/faker" }
 twitch_api = { path = "../libs/twitch" }
 usergen = { path = "../libs/usergen" }
 commands = { path = "../libs/commands" }

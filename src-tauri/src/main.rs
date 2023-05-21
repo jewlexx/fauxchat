@@ -15,6 +15,7 @@ use commands::Command;
 use twitch_api::creds::Credentials;
 
 mod irc;
+mod net;
 mod routes;
 
 #[macro_use]
@@ -86,7 +87,7 @@ async fn main() -> anyhow::Result<()> {
             .service(routes::credentials)
             .route("/ws/", web::get().to(irc::handle_ws))
     })
-    .bind(faker::addr())
+    .bind(net::addr())
     .expect("valid url and successful binding")
     .run();
 

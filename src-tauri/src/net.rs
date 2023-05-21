@@ -1,6 +1,3 @@
-#![warn(clippy::all, clippy::pedantic)]
-#![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
-
 use std::net::{Ipv4Addr, SocketAddrV4};
 
 #[must_use]

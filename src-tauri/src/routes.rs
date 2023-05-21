@@ -51,7 +51,7 @@ async fn twitch(req: HttpRequest) -> HttpResponse {
 const URL = '127.0.0.1';
 const PORT = '{}';
 // End injected section\n",
-                    faker::port()
+                    crate::net::port()
                 );
 
                 contents.extend(prefix.as_bytes());

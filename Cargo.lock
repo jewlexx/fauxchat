@@ -323,7 +323,6 @@ dependencies = [
  "anyhow",
  "commands",
  "crossbeam",
- "faker",
  "include_dir",
  "once_cell",
  "parking_lot",
@@ -1153,10 +1152,6 @@ dependencies = [
  "nom",
  "pin-project-lite",
 ]
-
-[[package]]
-name = "faker"
-version = "0.1.0"
 
 [[package]]
 name = "fastrand"
