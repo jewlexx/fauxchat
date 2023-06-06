@@ -7,7 +7,7 @@ license = "MIT AND Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-openai = { version = "1.0.0-alpha.9", features = ["reqwest"] }
+openai = { version = "1.0.0-alpha.10", features = ["reqwest"] }
 
 serde = { workspace = true }
 rand = { workspace = true }
