@@ -20,9 +20,17 @@ pub type SingleCommand = (Command, String);
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
 pub fn send_messages(receiver: &Receiver<SingleCommand>) {
+    use std::fs::OpenOptions;
+
     let conns = RECIPIENTS.lock().len();
     debug!("{conns} connections");
     debug!("Sending message");
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open("current.messages")
+        .unwrap();
 
     // While loop will exit once connection is closed
     while let Ok((cmd, username)) = receiver.recv() {
