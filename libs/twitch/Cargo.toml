@@ -8,7 +8,7 @@ license = "MIT AND Apache-2.0"
 
 [dependencies]
 reqwest = { version = "0.11.13", features = ["json"] }
-const_format = "0.2.30"
+const_format = "0.2.31"
 directories = "5.0.1"
 
 rayon = { workspace = true }
