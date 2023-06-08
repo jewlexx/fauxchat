@@ -20,7 +20,7 @@ pub async fn generate_names<const N: usize>() -> anyhow::Result<[String; N]> {
         let mut req = Completion::builder("text-davinci-003")
             .prompt(PROMPT)
             .create()
-            .await??;
+            .await?;
 
         names[i - 1] = req.choices.remove(0).text;
         names[i - 1] = names[i - 1].trim_start_matches('\n').to_string();
