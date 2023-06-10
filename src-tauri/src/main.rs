@@ -112,11 +112,14 @@ async fn main() -> anyhow::Result<()> {
 
     // Close the server when the app is closed
     server_thread.abort();
+    trace!("Server closed");
 
     // Drop the sender, thus closing the channel
     unsafe { TX.take() };
+    trace!("Dropped sender");
     // Thread will be completed, as we closed the connection
     messages_thread.await?;
+    trace!("Messages thread completed");
 
     Ok(())
 }
