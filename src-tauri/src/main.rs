@@ -42,6 +42,9 @@ fn invoke_command(command: &str, username: Option<&str>) {
 }
 
 #[tauri::command]
+fn load_file(path: &str) {}
+
+#[tauri::command]
 fn send_message(message: &str, username: &str, count: usize, delay: u64) {
     info!("Sending message");
 
@@ -106,7 +109,11 @@ async fn main() -> anyhow::Result<()> {
 
     trace!("Running app");
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![send_message, invoke_command])
+        .invoke_handler(tauri::generate_handler![
+            send_message,
+            invoke_command,
+            load_file
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     trace!("App closed");

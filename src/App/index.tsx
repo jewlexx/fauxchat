@@ -7,7 +7,9 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { invoke } from '@tauri-apps/api/tauri';
+import { open } from '@tauri-apps/api/dialog';
 import Chat from '../Chat';
 import styles from './index.module.scss';
 
@@ -37,6 +39,7 @@ function App() {
               onChange={(e) => setCommand(e.target.value)}
               style={{ gridArea: 'b' }}
             />
+
             <Button
               ref={btnRef}
               onClick={() => {
@@ -54,7 +57,24 @@ function App() {
             >
               Send Command
             </Button>
-            <IconButton></IconButton>
+
+            <IconButton
+              onClick={async () => {
+                const selected = await open({
+                  multiple: false,
+                  filters: [
+                    {
+                      name: 'Commands',
+                      extensions: ['commands'],
+                    },
+                  ],
+                });
+
+                // TODO: Handle the selected file
+              }}
+            >
+              <FileOpenIcon></FileOpenIcon>
+            </IconButton>
           </FormControl>
         </CardContent>
       </Card>
