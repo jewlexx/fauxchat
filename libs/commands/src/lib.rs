@@ -108,3 +108,20 @@ impl TryFrom<String> for Command {
         CommandsParser::parse_single(&value)
     }
 }
+
+impl std::fmt::Display for Command {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Command::Send {
+                message,
+                count,
+                delay,
+            } => {
+                write!(f, "send({message}, {count}, {delay})")
+            }
+            Command::Sleep { delay } => {
+                write!(f, "sleep({delay})")
+            }
+        }
+    }
+}

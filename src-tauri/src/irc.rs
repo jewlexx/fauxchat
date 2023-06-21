@@ -1,4 +1,4 @@
-use std::thread;
+use std::{thread, time::UNIX_EPOCH};
 
 use actix::{prelude::*, Actor, AsyncContext, StreamHandler};
 use actix_web::{web, Error, HttpRequest, HttpResponse};
@@ -21,7 +21,7 @@ pub type SingleCommand = (Command, String);
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
 pub fn send_messages(receiver: &Receiver<SingleCommand>) {
-    use std::fs::OpenOptions;
+    use std::{fs::OpenOptions, io::Write};
 
     let conns = RECIPIENTS.lock().len();
     debug!("{conns} connections");
@@ -50,6 +50,7 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
         println!("Found a message");
         // Skip any comments or empty lines
 
+        // TODO: Why double delay?
         let delay = cmd.get_delay();
 
         debug!("Sleeping for {} milliseconds", delay.as_millis());
@@ -59,6 +60,18 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
         debug!("Sending message");
 
         debug!("{:?}", cmd);
+
+        let command_string = cmd.to_string();
+
+        // Uses milliseconds as some commands might be sent in quick succession
+        let now = std::time::SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+
+        writeln!(file, "end_pause({now})").unwrap();
+
+        writeln!(file, "{command_string}").unwrap();
 
         match cmd {
             Command::Send {
