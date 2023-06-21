@@ -36,12 +36,15 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
             ))
             .unwrap();
 
-        formatted_date + ".messages"
+        // Save as .cmdir file (short for command intermediate representation)
+        // This file will require parsing to have the "end_pause" converted into regular sleep commands
+        formatted_date + ".cmdir"
     };
 
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
+        .create(true)
         .open(file_name)
         .unwrap();
 
@@ -69,6 +72,7 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
             .unwrap()
             .as_millis();
 
+        // TODO: Add immediate file parsing
         writeln!(file, "end_pause({now})").unwrap();
 
         writeln!(file, "{command_string}").unwrap();
