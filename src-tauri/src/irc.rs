@@ -7,6 +7,7 @@ use actix_web_actors::ws;
 use commands::Command;
 use crossbeam::channel::Receiver;
 use parking_lot::Mutex;
+use time::macros::format_description;
 use twitch_api::TwitchUser;
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
@@ -26,10 +27,22 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
     debug!("{conns} connections");
     debug!("Sending message");
 
+    let file_name = {
+        let now: time::OffsetDateTime = std::time::SystemTime::now().into();
+
+        let formatted_date = now
+            .format(format_description!(
+                "[year]-[month]-[day]-[hour]-[minute]-[second]"
+            ))
+            .unwrap();
+
+        formatted_date + ".messages"
+    };
+
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
-        .open("current.messages")
+        .open(file_name)
         .unwrap();
 
     // While loop will exit once connection is closed

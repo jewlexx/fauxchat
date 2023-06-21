@@ -36,6 +36,7 @@ rand = { workspace = true }
 twitch_api = { path = "../libs/twitch" }
 usergen = { path = "../libs/usergen" }
 commands = { path = "../libs/commands" }
+time = "0.3.22"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
