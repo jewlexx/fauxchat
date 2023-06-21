@@ -23,10 +23,6 @@ pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 pub fn send_messages(receiver: &Receiver<SingleCommand>) {
     use std::{fs::OpenOptions, io::Write};
 
-    let conns = RECIPIENTS.lock().len();
-    debug!("{conns} connections");
-    debug!("Sending message");
-
     let file_name = {
         let now: time::OffsetDateTime = std::time::SystemTime::now().into();
 
@@ -83,6 +79,10 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
                 count,
                 delay: _,
             } => {
+                let conns = RECIPIENTS.lock().len();
+                debug!("{conns} connections");
+                debug!("Sending message");
+
                 for _ in 0..count {
                     let user = {
                         if username == "random" {
