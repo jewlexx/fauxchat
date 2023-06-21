@@ -1,5 +1,12 @@
 import { useRef, useState } from 'react';
-import { Input, Button, FormControl, Card, CardContent } from '@mui/material';
+import {
+  Input,
+  Button,
+  IconButton,
+  FormControl,
+  Card,
+  CardContent,
+} from '@mui/material';
 import { invoke } from '@tauri-apps/api/tauri';
 import Chat from '../Chat';
 import styles from './index.module.scss';
@@ -47,6 +54,7 @@ function App() {
             >
               Send Command
             </Button>
+            <IconButton></IconButton>
           </FormControl>
         </CardContent>
       </Card>
