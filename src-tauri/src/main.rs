@@ -35,6 +35,7 @@ fn invoke_command(command: &str, username: Option<&str>) {
 
     let username = username.unwrap_or("random").to_string();
 
+    // TODO: Better error handling
     let parsed = Command::try_from(command.to_string()).expect("valid command");
 
     ready_message((parsed, username));
