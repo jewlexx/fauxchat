@@ -68,7 +68,7 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
             .unwrap()
             .as_millis();
 
-        // TODO: Add immediate file parsing
+        // TODO: Add username to sent command
         writeln!(file, "end_pause({now})").unwrap();
 
         writeln!(file, "{command_string}").unwrap();
