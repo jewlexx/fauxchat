@@ -9,11 +9,16 @@ $radius: 0.55rem;
   width: 100%;
   display: flex;
 
-  iframe {
-    height: auto;
+  .chatContainer {
+    background-color: darken(#2f2f2f, 10%);
     width: $sideWidth;
     height: $sideHeight;
     border-radius: $radius;
+
+    iframe {
+      height: auto;
+      border: none;
+    }
   }
 }
 

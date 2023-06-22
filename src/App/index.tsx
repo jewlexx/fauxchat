@@ -6,28 +6,32 @@ import { open } from '@tauri-apps/api/dialog';
 import Chat from '../Chat';
 import styles from './index.module.scss';
 
-async function handleSelected(selected: string | null) {
-  // Handle the selected file by calling the tauri load_file command
-  const res = await invoke('load_file', { path: selected });
+// TODO: Fix badges
 
-  return res;
+function handleSelected(selected: string | null): Promise<string> {
+  // Handle the selected file by calling the tauri load_file command
+  return invoke('load_file', { path: selected });
 }
 
 function App() {
   const [command, setCommand] = useState('');
+  const [error, setError] = useState<string | undefined>();
   const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div className={styles.container}>
       <Chat
+        className={styles.chatContainer}
         url="127.0.0.1"
         port="8080"
-        path="/twitch/v2/index.html?channel=maybejules&size=3&font=0&stroke=0&shadow=0&fade=30"
+        path="/twitch/v2/index.html?channel=maybejules&size=3&font=0&stroke=0&shadow=0"
       />
 
       <Card className={styles.controls}>
         <CardContent>
           <TextField
+            error={error !== undefined}
+            helperText={error}
             placeholder="Enter command"
             value={command}
             onKeyDown={(key) => {
@@ -38,14 +42,13 @@ function App() {
             onChange={(e) => setCommand(e.target.value)}
             style={{ gridArea: 'b' }}
           />
-
           <Button
             ref={btnRef}
             onClick={() => {
               const oldCommand = command;
 
-              const p = invoke('invoke_command', { command });
-              p.then((_) => {
+              invoke('invoke_command', { command }).then((result) => {
+                console.log(result);
                 // Only reset if the user has not updated the command
                 if (oldCommand === command) {
                   setCommand('');

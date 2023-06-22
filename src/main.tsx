@@ -14,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           padding: 0;
           width: 100vw;
           height: 100vh;
+          overflow: hidden;
         }
 
         :root {
