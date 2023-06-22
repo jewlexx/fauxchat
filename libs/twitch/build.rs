@@ -7,11 +7,11 @@ impl Credentials {
         use std::env::var;
 
         Ok(Self {
-            auth_token: var("TWITCH_AUTH_TOKEN")?,
             client_id: var("TWITCH_CLIENT_ID")?,
             client_secret: var("TWITCH_CLIENT_SECRET")?,
-            refresh_token: var("TWITCH_REFRESH_TOKEN")?,
             user_id: var("TWITCH_USER_ID")?,
+            refresh_token: var("TWITCH_REFRESH_TOKEN")?,
+            auth_token: var("TWITCH_AUTH_TOKEN")?,
         })
     }
 }
