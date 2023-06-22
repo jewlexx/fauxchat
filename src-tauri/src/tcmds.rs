@@ -51,8 +51,6 @@ pub fn load_file(path: &str) -> Result<()> {
     for line in lines {
         let parsed = Command::try_from(line?)?;
 
-        println!("Sending {:?}", parsed);
-
         // TODO: Replace random with actual user-defined username
         // TODO: (preferably implement a way to provide username in the command)
         ready_message((parsed, "random".to_string()));
