@@ -22,10 +22,7 @@ fn main() {
     let pwd = std::env::current_dir().unwrap();
 
     let creds: Credentials = {
-        let creds_path = {
-            let path = pwd.join("../../credentials.toml");
-            dunce::canonicalize(path).expect("valid credentials path")
-        };
+        let creds_path = pwd.join("../../credentials.toml");
 
         if !creds_path.exists() {
             use std::io::Write;
