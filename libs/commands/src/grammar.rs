@@ -1,5 +1,40 @@
 use pest::Parser;
 
+#[derive(Debug, thiserror::Error)]
+pub enum ParseError {
+    #[error("{0}")]
+    ParsingError(#[from] pest::error::Error<Rule>),
+
+    #[error("The command provided was invalid. Found {0}")]
+    InvalidCommand(String),
+}
+
+pub type Result<T> = std::result::Result<T, ParseError>;
+
+#[derive(Debug, Copy, Clone)]
+pub struct CommandInfo {
+    /// A standard command name, in lowercase
+    pub name: &'static str,
+    /// The number of arguments the command takes
+    pub arg_count: usize,
+}
+
+impl CommandInfo {
+    pub fn from_name(cmd_name: &str) -> Result<CommandInfo> {
+        match cmd_name.to_lowercase().as_str() {
+            "send" => Ok(CommandInfo {
+                name: "send",
+                arg_count: 3,
+            }),
+            "sleep" => Ok(CommandInfo {
+                name: "sleep",
+                arg_count: 1,
+            }),
+            _ => Err(ParseError::InvalidCommand(cmd_name.to_string())),
+        }
+    }
+}
+
 #[derive(Parser)]
 #[grammar = "../grammar.pest"]
 pub struct CommandsParser;
@@ -9,7 +44,7 @@ impl CommandsParser {
     ///
     /// # Panics
     /// - Will panic if the input is invalid.
-    pub fn parse_single(input: &str) -> anyhow::Result<super::Command> {
+    pub fn parse_parts(input: &str) -> Result<Vec<&str>> {
         let mut ast = CommandsParser::parse(Rule::command_single, input)?;
 
         // Should only be a single command
@@ -39,9 +74,9 @@ impl CommandsParser {
         let mut with_name = vec![cmd_info.name];
         with_name.extend(args.iter());
 
-        let parsed_command = super::Command::from_parts(&with_name)?;
+        // let parsed_command = super::Command::from_parts(&with_name)?;
 
-        Ok(parsed_command)
+        Ok(with_name)
     }
 
     // pub fn commands(input: &str) -> anyhow::Result<Vec<super::Command>> {
@@ -138,7 +173,10 @@ mod tests {
     #[test]
     fn test_parse() {
         // Send "Message Here" 10 times with 10 milliseconds in between each
-        let command = CommandsParser::parse_single("send(\"Message Here\", 10, 10)").unwrap();
+        let command = {
+            let parts = CommandsParser::parse_parts("send(\"Message Here\", 10, 10)").unwrap();
+            Command::from_parts(&parts).unwrap()
+        };
         let act = Command::Send {
             message: String::from("Message Here"),
             count: 10,
