@@ -13,7 +13,7 @@ edition = "2021"
 tauri-build = { version = "1.4", features = [] }
 
 [dependencies]
-tauri = { version = "1.4", features = ["shell-open"] }
+tauri = { version = "1.4", features = ["dialog-open", "shell-open"] }
 actix = "0.13.0"
 actix-web = "4.3.1"
 actix-web-actors = "4.2.0"
@@ -36,6 +36,8 @@ rand = { workspace = true }
 twitch_api = { path = "../libs/twitch" }
 usergen = { path = "../libs/usergen" }
 commands = { path = "../libs/commands" }
+time = "0.3.22"
+thiserror = "1.0.40"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

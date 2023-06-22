@@ -20,4 +20,4 @@ comment_single  = { comment_prefix ~ WHITE_SPACE ~ comment_content }
 line = { (command_single | comment_single) ~ endline }
 
 // Note that file does not currently work
-file = { (((command_single | comment_single) ~ endline) | endline)* ~ EOI }
+// file = { (((command_single | comment_single) ~ endline) | endline)* ~ EOI }

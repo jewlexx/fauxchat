@@ -3,7 +3,7 @@
 
 use std::{num::ParseIntError, time::Duration};
 
-use grammar::CommandsParser;
+use grammar::{CommandInfo, CommandsParser};
 use thiserror::Error;
 
 #[macro_use]
@@ -12,42 +12,25 @@ extern crate pest_derive;
 pub mod grammar;
 
 #[derive(Debug, Error)]
-pub enum Error {
-    #[error("The command provided was invalid. Found {0}")]
-    InvalidCommand(String),
+pub enum CommandsError {
+    #[error("The number provided was invalid")]
+    InvalidNumber(#[from] ParseIntError),
+    #[error("Failed to parse grammar: {0}")]
+    GrammarError(#[from] grammar::ParseError),
+    #[error("Failed to parse Command from given String. Was given: {0}")]
+    ParseCommand(String),
     #[error("No command was provided")]
     MissingCommand,
     #[error("No message was provided")]
     MissingMessage,
-    #[error("The number provided was invalid")]
-    InvalidNumber(#[from] ParseIntError),
     #[error("No number provided")]
     MissingNumber,
 }
 
-#[derive(Debug, Copy, Clone)]
-pub struct CommandInfo {
-    /// A standard command name, in lowercase
-    pub name: &'static str,
-    /// The number of arguments the command takes
-    pub arg_count: usize,
-}
+pub type Result<T> = std::result::Result<T, CommandsError>;
 
-impl CommandInfo {
-    pub fn from_name(cmd_name: &str) -> Result<CommandInfo, Error> {
-        match cmd_name.to_lowercase().as_str() {
-            "send" => Ok(CommandInfo {
-                name: "send",
-                arg_count: 3,
-            }),
-            "sleep" => Ok(CommandInfo {
-                name: "sleep",
-                arg_count: 1,
-            }),
-            _ => Err(Error::InvalidCommand(cmd_name.to_string())),
-        }
-    }
-}
+// TODO: Add support for random delay in range
+// TODO: i.e rather than 1000, provide 1000..5000, and it picks a random number in that range
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
@@ -62,7 +45,7 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn from_parts(parts: &[&str]) -> Result<Command, Error> {
+    pub fn from_parts(parts: &[&str]) -> Result<Command> {
         let cmd_name = parts[0].to_lowercase();
         let cmd_info = CommandInfo::from_name(&cmd_name)?;
         match cmd_info.name {
@@ -102,9 +85,28 @@ impl Command {
 }
 
 impl TryFrom<String> for Command {
-    type Error = anyhow::Error;
+    type Error = CommandsError;
 
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        CommandsParser::parse_single(&value)
+    fn try_from(value: String) -> Result<Self> {
+        let parts = CommandsParser::parse_parts(&value)?;
+
+        Command::from_parts(&parts)
+    }
+}
+
+impl std::fmt::Display for Command {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Command::Send {
+                message,
+                count,
+                delay,
+            } => {
+                write!(f, "send(\"{message}\", {count}, {delay})")
+            }
+            Command::Sleep { delay } => {
+                write!(f, "sleep({delay})")
+            }
+        }
     }
 }

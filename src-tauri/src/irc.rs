@@ -1,4 +1,4 @@
-use std::thread;
+use std::{thread, time::UNIX_EPOCH};
 
 use actix::{prelude::*, Actor, AsyncContext, StreamHandler};
 use actix_web::{web, Error, HttpRequest, HttpResponse};
@@ -7,6 +7,7 @@ use actix_web_actors::ws;
 use commands::Command;
 use crossbeam::channel::Receiver;
 use parking_lot::Mutex;
+use time::macros::format_description;
 use twitch_api::TwitchUser;
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
@@ -20,15 +21,35 @@ pub type SingleCommand = (Command, String);
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
 pub fn send_messages(receiver: &Receiver<SingleCommand>) {
-    let conns = RECIPIENTS.lock().len();
-    debug!("{conns} connections");
-    debug!("Sending message");
+    use std::{fs::OpenOptions, io::Write};
+
+    let file_name = {
+        let now: time::OffsetDateTime = std::time::SystemTime::now().into();
+
+        let formatted_date = now
+            .format(format_description!(
+                "[year]-[month]-[day]-[hour]-[minute]-[second]"
+            ))
+            .unwrap();
+
+        // Save as .cmdir file (short for command intermediate representation)
+        // This file will require parsing to have the "end_pause" converted into regular sleep commands
+        formatted_date + ".cmdir"
+    };
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .create(true)
+        .open(file_name)
+        .unwrap();
 
     // While loop will exit once connection is closed
     while let Ok((cmd, username)) = receiver.recv() {
         println!("Found a message");
         // Skip any comments or empty lines
 
+        // TODO: Why double delay?
         let delay = cmd.get_delay();
 
         debug!("Sleeping for {} milliseconds", delay.as_millis());
@@ -39,12 +60,29 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
 
         debug!("{:?}", cmd);
 
+        let command_string = cmd.to_string();
+
+        // Uses milliseconds as some commands might be sent in quick succession
+        let now = std::time::SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+
+        // TODO: Add username to sent command
+        writeln!(file, "end_pause({now})").unwrap();
+
+        writeln!(file, "{command_string}").unwrap();
+
         match cmd {
             Command::Send {
                 ref message,
                 count,
                 delay: _,
             } => {
+                let conns = RECIPIENTS.lock().len();
+                debug!("{conns} connections");
+                debug!("Sending message");
+
                 for _ in 0..count {
                     let user = {
                         if username == "random" {
