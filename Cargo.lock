@@ -339,6 +339,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "thiserror",
  "time",
  "tokio",
  "toml 0.7.3",

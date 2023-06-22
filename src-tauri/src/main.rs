@@ -11,7 +11,6 @@ use once_cell::sync::OnceCell;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
-use commands::Command;
 use twitch_api::creds::Credentials;
 
 mod irc;
@@ -29,33 +28,7 @@ fn ready_message(msg: irc::SingleCommand) {
     tx.send(msg).expect("connected channel. receiver dropped?");
 }
 
-#[tauri::command]
-fn invoke_command(command: &str, username: Option<&str>) {
-    info!("Invoking command: {}", command);
-
-    let username = username.unwrap_or("random").to_string();
-
-    // TODO: Better error handling
-    let parsed = Command::try_from(command.to_string()).expect("valid command");
-
-    ready_message((parsed, username));
-}
-
-#[tauri::command]
-fn load_file(path: &str) {}
-
-#[tauri::command]
-fn send_message(message: &str, username: &str, count: usize, delay: u64) {
-    info!("Sending message");
-
-    let command = Command::Send {
-        message: message.to_string(),
-        count,
-        delay,
-    };
-
-    ready_message((command, username.to_string()));
-}
+mod tcmds;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -110,9 +83,9 @@ async fn main() -> anyhow::Result<()> {
     trace!("Running app");
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            send_message,
-            invoke_command,
-            load_file
+            tcmds::send_message,
+            tcmds::invoke_command,
+            tcmds::load_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

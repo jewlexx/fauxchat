@@ -13,6 +13,11 @@ import { open } from '@tauri-apps/api/dialog';
 import Chat from '../Chat';
 import styles from './index.module.scss';
 
+async function handleSelected(selected: string | null) {
+  // Handle the selected file by calling the tauri load_file command
+  const res = await invoke('load_file', { path: selected });
+}
+
 function App() {
   const [command, setCommand] = useState('');
   const btnRef = useRef<HTMLButtonElement>(null);
