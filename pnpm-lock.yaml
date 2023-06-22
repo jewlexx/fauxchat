@@ -10,16 +10,10 @@ dependencies:
     version: 11.11.1(@types/react@18.2.13)(react@18.2.0)
   '@emotion/styled':
     specifier: 11.11.0
-<<<<<<< HEAD
     version: 11.11.0(@emotion/react@11.11.1)(@types/react@18.2.13)(react@18.2.0)
   '@mui/icons-material':
     specifier: 5.11.16
     version: 5.11.16(@mui/material@5.13.5)(@types/react@18.2.13)(react@18.2.0)
-||||||| 89f2a07
-    version: 11.11.0(@emotion/react@11.11.1)(@types/react@18.2.9)(react@18.2.0)
-=======
-    version: 11.11.0(@emotion/react@11.11.1)(@types/react@18.2.13)(react@18.2.0)
->>>>>>> trunk
   '@mui/material':
     specifier: 5.13.5
     version: 5.13.5(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.13)(react-dom@18.2.0)(react@18.2.0)
@@ -56,28 +50,14 @@ devDependencies:
     specifier: 4.0.1
     version: 4.0.1(vite@4.3.9)
   sass:
-<<<<<<< HEAD
-    specifier: 1.63.5
-    version: 1.63.5
-||||||| 89f2a07
-    specifier: 1.63.2
-    version: 1.63.2
-=======
     specifier: 1.63.6
     version: 1.63.6
->>>>>>> trunk
   typescript:
     specifier: 5.1.3
     version: 5.1.3
   vite:
     specifier: 4.3.9
-<<<<<<< HEAD
-    version: 4.3.9(@types/node@20.3.1)(sass@1.63.5)
-||||||| 89f2a07
-    version: 4.3.9(@types/node@20.2.1)(sass@1.63.2)
-=======
     version: 4.3.9(@types/node@20.3.1)(sass@1.63.6)
->>>>>>> trunk
 
 packages:
 
@@ -369,7 +349,7 @@ packages:
     resolution: {integrity: sha512-m4HEDZleaaCH+XgDDsPF15Ht6wTLsgDTeR3WYj9Q/k76JtWhrJjcP4+/XlG8LGT/Rol9qUfOIztXeA84ATpqPQ==}
     dependencies:
       '@babel/helper-module-imports': 7.21.4
-      '@babel/runtime': 7.22.3
+      '@babel/runtime': 7.22.5
       '@emotion/hash': 0.9.1
       '@emotion/memoize': 0.8.1
       '@emotion/serialize': 1.1.2
@@ -741,7 +721,6 @@ packages:
     resolution: {integrity: sha512-yFrMWcrlI0TqRN5jpb6Ma9iI7sGTHpytdzzL33oskFHNQ8UgrtPas33Y1K7sWAMwCrr1qbWDrOHLAQG4tAzuSw==}
     dev: false
 
-<<<<<<< HEAD
   /@mui/icons-material@5.11.16(@mui/material@5.13.5)(@types/react@18.2.13)(react@18.2.0):
     resolution: {integrity: sha512-oKkx9z9Kwg40NtcIajF9uOXhxiyTZrrm9nmIJ4UjkU2IdHpd4QVLbCc/5hZN/y0C6qzi2Zlxyr9TGddQx2vx2A==}
     engines: {node: '>=12.0.0'}
@@ -753,7 +732,7 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/runtime': 7.22.3
+      '@babel/runtime': 7.22.5
       '@mui/material': 5.13.5(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.13)(react-dom@18.2.0)(react@18.2.0)
       '@types/react': 18.2.13
       react: 18.2.0
@@ -761,13 +740,6 @@ packages:
 
   /@mui/material@5.13.5(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.13)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-eMay+Ue1OYXOFMQA5Aau7qbAa/kWHLAyi0McsbPTWssCbGehqkF6CIdPsfVGw6tlO+xPee1hUitphHJNL3xpOQ==}
-||||||| 89f2a07
-  /@mui/material@5.13.4(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.9)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Yq+4f1KLPa/Szd3xqra2hbOAf2Usl8GbubncArM6LIp40mBLtXIdPE29MNtHsbtuzz4g+eidrETgoi3wdbEYfQ==}
-=======
-  /@mui/material@5.13.5(@emotion/react@11.11.1)(@emotion/styled@11.11.0)(@types/react@18.2.13)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-eMay+Ue1OYXOFMQA5Aau7qbAa/kWHLAyi0McsbPTWssCbGehqkF6CIdPsfVGw6tlO+xPee1hUitphHJNL3xpOQ==}
->>>>>>> trunk
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@emotion/react': ^11.5.0
@@ -1061,13 +1033,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.5)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.5)
       react-refresh: 0.14.0
-<<<<<<< HEAD
-      vite: 4.3.9(@types/node@20.3.1)(sass@1.63.5)
-||||||| 89f2a07
-      vite: 4.3.9(@types/node@20.2.1)(sass@1.63.2)
-=======
       vite: 4.3.9(@types/node@20.3.1)(sass@1.63.6)
->>>>>>> trunk
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -1090,7 +1056,7 @@ packages:
     resolution: {integrity: sha512-Cg7TFGpIr01vOQNODXOOaGz2NpCU5gl8x1qJFbb6hbZxR7XrcE2vtbAsTAbJ7/xwJtUuJEw8K8Zr/AE0LHlesg==}
     engines: {node: '>=10', npm: '>=6'}
     dependencies:
-      '@babel/runtime': 7.22.3
+      '@babel/runtime': 7.22.5
       cosmiconfig: 7.1.0
       resolve: 1.22.2
     dev: false
@@ -1112,16 +1078,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-<<<<<<< HEAD
-      caniuse-lite: 1.0.30001506
-      electron-to-chromium: 1.4.435
-||||||| 89f2a07
-      caniuse-lite: 1.0.30001494
-      electron-to-chromium: 1.4.419
-=======
       caniuse-lite: 1.0.30001506
       electron-to-chromium: 1.4.437
->>>>>>> trunk
       node-releases: 2.0.12
       update-browserslist-db: 1.0.11(browserslist@4.21.9)
     dev: true
@@ -1207,16 +1165,8 @@ packages:
       csstype: 3.1.2
     dev: false
 
-<<<<<<< HEAD
-  /electron-to-chromium@1.4.435:
-    resolution: {integrity: sha512-B0CBWVFhvoQCW/XtjRzgrmqcgVWg6RXOEM/dK59+wFV93BFGR6AeNKc4OyhM+T3IhJaOOG8o/V+33Y2mwJWtzw==}
-||||||| 89f2a07
-  /electron-to-chromium@1.4.419:
-    resolution: {integrity: sha512-jdie3RiEgygvDTyS2sgjq71B36q2cDSBfPlwzUyuOrfYTNoYWyBxxjGJV/HAu3A2hB0Y+HesvCVkVAFoCKwCSw==}
-=======
   /electron-to-chromium@1.4.437:
     resolution: {integrity: sha512-ZFekRuBOHUXp21wrR5lshT6pZa/KmjkhKBAtmZz4NN5sCWlHOk3kdhiwFINrDBsRLX6FjyBAb1TRN+KBeNlyzQ==}
->>>>>>> trunk
     dev: true
 
   /error-ex@1.3.2:
@@ -1578,16 +1528,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-<<<<<<< HEAD
-  /sass@1.63.5:
-    resolution: {integrity: sha512-Q6c5gs482oezdAp+0fWF9cRisvpy7yfYb64knID0OE8AnMgtkluRPfpGMFjeD4/+M4+6QpJZCU6JRSxbjiktkg==}
-||||||| 89f2a07
-  /sass@1.63.2:
-    resolution: {integrity: sha512-u56TU0AIFqMtauKl/OJ1AeFsXqRHkgO7nCWmHaDwfxDo9GUMSqBA4NEh6GMuh1CYVM7zuROYtZrHzPc2ixK+ww==}
-=======
   /sass@1.63.6:
     resolution: {integrity: sha512-MJuxGMHzaOW7ipp+1KdELtqKbfAWbH7OLIdoSMnVe3EXPMTmxTmlaZDCTsgIpPCs3w99lLo9/zDKkOrJuT5byw==}
->>>>>>> trunk
     engines: {node: '>=14.0.0'}
     hasBin: true
     dependencies:
@@ -1660,13 +1602,7 @@ packages:
       picocolors: 1.0.0
     dev: true
 
-<<<<<<< HEAD
-  /vite@4.3.9(@types/node@20.3.1)(sass@1.63.5):
-||||||| 89f2a07
-  /vite@4.3.9(@types/node@20.2.1)(sass@1.63.2):
-=======
   /vite@4.3.9(@types/node@20.3.1)(sass@1.63.6):
->>>>>>> trunk
     resolution: {integrity: sha512-qsTNZjO9NoJNW7KnOrgYwczm0WctJ8m/yqYAMAK9Lxt4SoySUfS5S8ia9K7JHpa3KEeMfyF8LoJ3c5NeBJy6pg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -1695,13 +1631,7 @@ packages:
       esbuild: 0.17.19
       postcss: 8.4.24
       rollup: 3.23.1
-<<<<<<< HEAD
-      sass: 1.63.5
-||||||| 89f2a07
-      sass: 1.63.2
-=======
       sass: 1.63.6
->>>>>>> trunk
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
