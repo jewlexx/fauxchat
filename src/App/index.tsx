@@ -39,21 +39,26 @@ function App() {
                 btnRef.current?.click();
               }
             }}
-            onChange={(e) => setCommand(e.target.value)}
+            onChange={(e) => {
+              setError(null);
+              setCommand(e.target.value);
+            }}
           />
           <Button
             ref={btnRef}
             onClick={() => {
               const oldCommand = command;
 
-              invoke('invoke_command', { command }).then((result) => {
-                if (typeof result === 'string') {
-                  setError(result);
+              invoke('invoke_command', { command })
+                .then(() => {
                   // Only reset if the user has not updated the command
-                } else if (oldCommand === command) {
-                  setCommand('');
-                }
-              });
+                  if (oldCommand === command) {
+                    setCommand('');
+                  }
+                })
+                .catch((error) => {
+                  setError(error);
+                });
             }}
           >
             Send Command
@@ -71,8 +76,8 @@ function App() {
                 ],
               });
 
-              if (!Array.isArray(selected)) {
-                handleSelected(selected).then(setError);
+              if (typeof selected === 'string') {
+                handleSelected(selected).catch(setError);
               }
             }}
           >
