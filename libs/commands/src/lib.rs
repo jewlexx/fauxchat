@@ -29,6 +29,9 @@ pub enum CommandsError {
 
 pub type Result<T> = std::result::Result<T, CommandsError>;
 
+// TODO: Add support for random delay in range
+// TODO: i.e rather than 1000, provide 1000..5000, and it picks a random number in that range
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
     /// Sends the given message the given number of times
@@ -99,7 +102,7 @@ impl std::fmt::Display for Command {
                 count,
                 delay,
             } => {
-                write!(f, "send({message}, {count}, {delay})")
+                write!(f, "send(\"{message}\", {count}, {delay})")
             }
             Command::Sleep { delay } => {
                 write!(f, "sleep({delay})")

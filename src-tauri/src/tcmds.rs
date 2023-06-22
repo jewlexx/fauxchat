@@ -45,10 +45,13 @@ pub fn invoke_command(command: &str, username: Option<&str>) -> Result<()> {
 
 #[tauri::command]
 pub fn load_file(path: &str) -> Result<()> {
+    println!("Loading {path}");
     let lines = read_lines(path)?;
 
     for line in lines {
         let parsed = Command::try_from(line?)?;
+
+        println!("Sending {:?}", parsed);
 
         // TODO: Replace random with actual user-defined username
         // TODO: (preferably implement a way to provide username in the command)

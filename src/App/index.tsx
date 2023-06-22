@@ -16,6 +16,8 @@ import styles from './index.module.scss';
 async function handleSelected(selected: string | null) {
   // Handle the selected file by calling the tauri load_file command
   const res = await invoke('load_file', { path: selected });
+
+  return res;
 }
 
 function App() {
@@ -74,6 +76,10 @@ function App() {
                     },
                   ],
                 });
+
+                if (!Array.isArray(selected)) {
+                  handleSelected(selected).then(console.log);
+                }
 
                 // TODO: Handle the selected file
               }}
