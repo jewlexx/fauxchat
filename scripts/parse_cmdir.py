@@ -22,3 +22,5 @@ with open(file_path, "r") as f:
                     f2.write(f"sleep({timestamp - old_end})\n")
 
                 old_end = timestamp
+
+os.remove(file_path)
