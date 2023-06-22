@@ -15,7 +15,7 @@ function handleSelected(selected: string | null): Promise<string> {
 
 function App() {
   const [command, setCommand] = useState('');
-  const [error, setError] = useState<string | undefined>();
+  const [error, setError] = useState<string | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
   return (
@@ -30,7 +30,7 @@ function App() {
       <Card className={styles.controls}>
         <CardContent>
           <TextField
-            error={error !== undefined}
+            error={error !== null}
             helperText={error}
             placeholder="Enter command"
             value={command}
@@ -40,7 +40,6 @@ function App() {
               }
             }}
             onChange={(e) => setCommand(e.target.value)}
-            style={{ gridArea: 'b' }}
           />
           <Button
             ref={btnRef}
@@ -48,14 +47,14 @@ function App() {
               const oldCommand = command;
 
               invoke('invoke_command', { command }).then((result) => {
-                console.log(result);
-                // Only reset if the user has not updated the command
-                if (oldCommand === command) {
+                if (typeof result === 'string') {
+                  setError(result);
+                  // Only reset if the user has not updated the command
+                } else if (oldCommand === command) {
                   setCommand('');
                 }
               });
             }}
-            style={{ gridArea: 'c' }}
           >
             Send Command
           </Button>
@@ -73,7 +72,7 @@ function App() {
               });
 
               if (!Array.isArray(selected)) {
-                handleSelected(selected).then(console.log);
+                handleSelected(selected).then(setError);
               }
             }}
           >
