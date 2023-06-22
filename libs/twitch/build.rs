@@ -17,6 +17,8 @@ impl Credentials {
 }
 
 fn main() {
+    use std::fs::File;
+
     let pwd = std::env::current_dir().unwrap();
 
     let creds: Credentials = {
@@ -26,12 +28,23 @@ fn main() {
         };
 
         if !creds_path.exists() {
-            Credentials::load_from_env()
-                .expect("valid credentials provided in env, or credentials file")
+            use std::io::Write;
+
+            let creds = Credentials::load_from_env()
+                .expect("valid credentials provided in env, or credentials file");
+
+            let creds_string = toml::to_string_pretty(&creds).unwrap();
+
+            File::create(creds_path)
+                .unwrap()
+                .write_all(creds_string.as_bytes())
+                .unwrap();
+
+            creds
         } else {
             println!("cargo:rerun-if-changed={}", creds_path.display());
 
-            let mut creds_file = std::fs::File::open(creds_path).unwrap();
+            let mut creds_file = File::open(creds_path).unwrap();
 
             let mut creds = String::new();
 
