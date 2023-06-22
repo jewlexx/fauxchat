@@ -24,7 +24,7 @@ function App() {
         className={styles.chatContainer}
         url="127.0.0.1"
         port="8080"
-        path="/twitch/v2/index.html?channel=maybejules&size=3&font=0&stroke=0&shadow=0"
+        path="/twitch/v2/index.html?channel=possiblyjuliette&size=3&font=0&stroke=0&shadow=0"
       />
 
       <Card className={styles.controls}>
