@@ -2,9 +2,9 @@ use pest::Parser;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ParseError {
+    // The string provided is the error message from pest
     #[error("{0}")]
-    ParsingError(#[from] pest::error::Error<Rule>),
-
+    ParsingError(String),
     #[error("The command provided was invalid. Found {0}")]
     InvalidCommand(String),
 }
@@ -45,7 +45,8 @@ impl CommandsParser {
     /// # Panics
     /// - Will panic if the input is invalid.
     pub fn parse_parts(input: &str) -> Result<Vec<&str>> {
-        let mut ast = CommandsParser::parse(Rule::command_single, input)?;
+        let mut ast = CommandsParser::parse(Rule::command_single, input)
+            .map_err(|e| ParseError::ParsingError(e.to_string()))?;
 
         // Should only be a single command
         assert_eq!(ast.len(), 1);
