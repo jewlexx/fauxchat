@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use actix_web::{HttpRequest, HttpResponse};
 use include_dir::{include_dir, Dir};
 
+// TODO: Use local files in debug builds
 static CHAT_DIR: Dir<'_> = include_dir!("chat");
 
 // User follows reference: https://dev.twitch.tv/docs/api/reference#get-users-follows
