@@ -2201,10 +2201,10 @@ index e333d72..0000000
 -});
 \ No newline at end of file
 diff --git a/v2/script.js b/v2/script.js
-index 8b69758..3548beb 100644
+index 8b69758..5ecf06f 100644
 --- a/v2/script.js
 +++ b/v2/script.js
-@@ -1,558 +1,868 @@
+@@ -1,558 +1,870 @@
 -(function($) { // Thanks to BrunoLM (https://stackoverflow.com/a/3855394)
 -    $.QueryString = (function(paramsArray) {
 -        let params = {};
@@ -3074,7 +3074,9 @@ index 8b69758..3548beb 100644
 +            var $badge = $('<img/>');
 +            $badge.addClass('badge');
 +            badge = badge.split('/');
-+            $badge.attr('src', Chat.info.badges[badge[0] + ':' + badge[1]]);
++            const badgeRef = badge[0] + ':' + badge[1];
++            const badgeSrc = Chat.info.badges[badgeRef];
++            $badge.attr('src', badgeSrc);
 +            $userInfo.append($badge);
 +          });
 +        }
