@@ -39,6 +39,8 @@ impl Credentials {
             creds.refresh().await?;
         }
 
+        dbg!(&creds);
+
         creds.save()?;
 
         Ok(())
@@ -90,8 +92,10 @@ impl Credentials {
         Ok(data_dir.join("credentials.toml"))
     }
 
-    pub async fn expires_in(&self) -> anyhow::Result<SystemTime> {
-        let response: serde_json::Value = reqwest::get("https://id.twitch.tv/oauth2/validate")
+    pub async fn expires_in(&self) -> anyhow::Result<Duration> {
+        let response: serde_json::Value = crate::CLIENT
+            .get("https://id.twitch.tv/oauth2/validate")
+            .send()
             .await?
             .json()
             .await?;
@@ -100,21 +104,13 @@ impl Credentials {
             anyhow::anyhow!("Could not parse expires_in from response: {:?}", response)
         })?;
 
-        let expires_in_dur = Duration::from_secs(expires_in);
-
-        let now = SystemTime::now() + expires_in_dur;
-
-        Ok(now)
+        Ok(Duration::from_secs(expires_in))
     }
 
     pub async fn remain_30(&self) -> anyhow::Result<bool> {
-        let now = SystemTime::now();
-        // Default to now, meaning that it will trigger a refresh
-        let expires_in = self.expires_in().await.unwrap_or(now);
+        let expires_in = self.expires_in().await?;
 
-        let diff = expires_in.duration_since(now)?;
-
-        Ok(diff < Duration::from_secs(30 * 60))
+        Ok(expires_in < Duration::from_secs(30 * 60))
     }
 
     pub async fn refresh(&mut self) -> anyhow::Result<()> {
