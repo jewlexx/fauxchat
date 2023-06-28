@@ -64,8 +64,11 @@ impl TwitchVips {
         let mut data: TwitchVips = CLIENT.get(&url).send().await?.json().await?;
 
         while let Some(ref cursor) = data.pagination.cursor {
-            let url = format!("{url}?after={cursor}");
-            let new_data: TwitchVips = CLIENT.get(url).send().await?.json().await?;
+            let url = format!("{url}&after={cursor}");
+            let new_data: TwitchVips = {
+                let txt = CLIENT.get(dbg!(url)).send().await?.text().await?;
+                serde_json::from_str(&dbg!(txt))?
+            };
 
             data.data.extend(new_data.data);
             data.pagination = new_data.pagination;
