@@ -14,13 +14,12 @@ pub static USERS: Mutex<UserPool> = Mutex::new(UserPool { users: Vec::new() });
 
 #[macro_export]
 macro_rules! api_url {
-    ($url:literal) => {{
-        use const_format::formatcp;
-
-        const URL: &str = formatcp!($url, user_id = env!("TWITCH_USER_ID"));
-
-        formatcp!("https://api.twitch.tv/helix/{}", URL)
-    }};
+    ($url:literal) => {
+        format!(
+            "https://api.twitch.tv/helix/{}",
+            format!($url, user_id = env!("TWITCH_USER_ID"))
+        )
+    };
 }
 
 pub static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
@@ -75,6 +74,8 @@ pub struct TwitchUser {
 }
 
 impl TwitchUser {
+    /// # Panics
+    /// - If the list of users is empty (which it should never be)
     pub fn random() -> Self {
         let mut rng = rand::thread_rng();
         let users = &crate::USERS.lock().users;
