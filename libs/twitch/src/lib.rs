@@ -49,6 +49,7 @@ pub static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TwitchVips {
     pub data: Vec<VipDatum>,
+    pub pagination: Pagination,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -56,6 +57,22 @@ pub struct VipDatum {
     pub user_id: String,
     pub user_name: String,
     pub user_login: String,
+}
+
+impl TwitchVips {
+    async fn from_api(url: String) -> anyhow::Result<Self> {
+        let mut data: TwitchVips = CLIENT.get(&url).send().await?.json().await?;
+
+        while let Some(ref cursor) = data.pagination.cursor {
+            let url = format!("{url}?after={cursor}");
+            let new_data: TwitchVips = CLIENT.get(url).send().await?.json().await?;
+
+            data.data.extend(new_data.data);
+            data.pagination = new_data.pagination;
+        }
+
+        Ok(data)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -241,33 +258,29 @@ impl TwitchUser {
 
 impl UserPool {
     pub async fn get() -> anyhow::Result<Self> {
-        let vips: TwitchVips = CLIENT
-            .get(crate::api_url!(
-                "channels/vips?broadcaster_id={user_id}&first=100"
-            ))
-            .send()
-            .await?
-            .json()
-            .await?;
+        println!("Downloading pool");
+        println!("Downloading pool");
+        println!("Downloading pool");
+        println!("Downloading pool");
+        println!("Downloading pool");
+        println!("Downloading pool");
+        println!("Downloading pool");
 
-        let mods: TwitchVips = CLIENT
-            .get(crate::api_url!(
-                "moderation/moderators?broadcaster_id={user_id}&first=100"
-            ))
-            .send()
-            .await?
-            .json()
-            .await?;
+        // TODO: Add ability to download all users
+        let vips = TwitchVips::from_api(crate::api_url!(
+            "channels/vips?broadcaster_id={user_id}&first=100"
+        ))
+        .await?;
 
-        // TODO: Add ability to download all subs
-        let subs: TwitchVips = CLIENT
-            .get(crate::api_url!(
-                "subscriptions?broadcaster_id={user_id}&first=100"
-            ))
-            .send()
-            .await?
-            .json()
-            .await?;
+        let mods = TwitchVips::from_api(crate::api_url!(
+            "moderation/moderators?broadcaster_id={user_id}&first=100"
+        ))
+        .await?;
+
+        let subs = TwitchVips::from_api(crate::api_url!(
+            "subscriptions?broadcaster_id={user_id}&first=100"
+        ))
+        .await?;
 
         let users = TwitchUsers::new().await?;
 
