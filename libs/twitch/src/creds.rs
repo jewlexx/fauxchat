@@ -3,6 +3,7 @@ use std::{
     time::{Duration, SystemTime},
 };
 
+use anyhow::Context;
 use const_format::formatcp;
 use once_cell::sync::Lazy;
 use parking_lot::Mutex;
@@ -42,13 +43,13 @@ impl Credentials {
             creds.refresh().await?;
         }
 
-        if !matches!(creds.remain_30().await, Ok(false)) {
-            anyhow::bail!(
-                "Twitch API token not working for whatever reason. Refresh did not work :("
-            );
+        if (creds
+            .remain_30()
+            .await
+            .context("Twitch API token not working for whatever reason. Refresh did not work :(")?)
+        {
+            anyhow::bail!("Could not refresh API token")
         }
-
-        creds.save()?;
 
         Ok(())
     }
@@ -109,9 +110,9 @@ impl Credentials {
 
         dbg!(&response);
 
-        let status = response["status"].as_u64().expect("valid status");
+        let status = response["status"].as_u64().unwrap_or(200);
 
-        if (200..300).contains(&status) {
+        if !(200..300).contains(&status) {
             anyhow::bail!("Found non 200 status: {}", status);
         }
 
@@ -139,6 +140,8 @@ impl Credentials {
             client_secret = CLIENT_SECRET,
             refresh_token = REFRESH_TOKEN,
         );
+
+        tracing::info!("Refreshing!!!");
 
         let resp: AccessToken = reqwest::Client::new()
             .post(REFRESH_URL)
