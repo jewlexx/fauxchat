@@ -49,13 +49,6 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
         println!("Found a message");
         // Skip any comments or empty lines
 
-        // TODO: Why double delay?
-        let delay = cmd.get_delay();
-
-        debug!("Sleeping for {} milliseconds", delay.as_millis());
-
-        thread::sleep(delay);
-
         debug!("Sending message");
 
         debug!("{:?}", cmd);
