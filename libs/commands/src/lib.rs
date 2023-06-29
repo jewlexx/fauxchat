@@ -37,6 +37,7 @@ pub enum Command {
     /// Sends the given message the given number of times
     Send {
         message: String,
+        username: String,
         count: usize,
         delay: u64,
     },
@@ -59,6 +60,7 @@ impl Command {
                     let value = lit.value();
                     value.to_string()
                 },
+                username: "random".to_string(),
                 count: parts[2].parse()?,
                 delay: parts[3].parse()?,
             }),
@@ -99,10 +101,18 @@ impl std::fmt::Display for Command {
         match self {
             Command::Send {
                 message,
+                username,
                 count,
                 delay,
             } => {
-                write!(f, "send(\"{message}\", {count}, {delay})")
+                write!(f, "send(\"{message}\", {count}, {delay}")?;
+
+                // Only embed the username if it is not "random"
+                if username != "random" {
+                    write!(f, ", {username}")?;
+                }
+
+                write!(f, ")")
             }
             Command::Sleep { delay } => {
                 write!(f, "sleep({delay})")

@@ -93,6 +93,7 @@ mod tests {
         };
         let act = Command::Send {
             message: String::from("Message Here"),
+            username: String::from("random"),
             count: 10,
             delay: 10,
         };
