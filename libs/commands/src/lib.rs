@@ -54,7 +54,6 @@ fn parse_str_lit(lit: &str) -> String {
 
 impl Command {
     pub fn from_parts(parts: &[&str]) -> Result<Command> {
-        dbg!(&parts);
         let cmd_name = parts[0].to_lowercase();
         let cmd_info = CommandInfo::from_name(&cmd_name)?;
         match cmd_info.name {
