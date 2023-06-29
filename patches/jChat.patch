@@ -2201,10 +2201,10 @@ index e333d72..0000000
 -});
 \ No newline at end of file
 diff --git a/v2/script.js b/v2/script.js
-index 8b69758..f550d72 100644
+index 8b69758..b99a3d1 100644
 --- a/v2/script.js
 +++ b/v2/script.js
-@@ -1,558 +1,868 @@
+@@ -1,558 +1,870 @@
 -(function($) { // Thanks to BrunoLM (https://stackoverflow.com/a/3855394)
 -    $.QueryString = (function(paramsArray) {
 -        let params = {};
@@ -2626,16 +2626,16 @@ index 8b69758..f550d72 100644
 -            while (linesToDelete > 0) {
 -                $('.chat_line').eq(0).remove();
 -                linesToDelete--;
--            }
++              var imageUrl = emote.images['2x'] || emote.images['1x'];
++              var upscale = true;
+             }
 -        } else if (Chat.info.fade) {
 -            var messageTime = $('.chat_line').eq(0).data('time');
 -            if ((Date.now() - messageTime) / 1000 >= Chat.info.fade) {
 -                $('.chat_line').eq(0).fadeOut(function() {
 -                    $(this).remove();
 -                });
-+              var imageUrl = emote.images['2x'] || emote.images['1x'];
-+              var upscale = true;
-             }
+-            }
 -        }
 -    }, 200),
 -
@@ -2757,10 +2757,22 @@ index 8b69758..f550d72 100644
 +      }
 +
 +      // Load badges
-+      TwitchAPI('https://badges.twitch.tv/v1/badges/global/display').done(
++      TwitchAPI('https://api.twitch.tv/helix/chat/badges/global').done(
 +        function (global) {
-+          Object.entries(global.data[1].versions).forEach((v) => {
-+            Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
++          global.data.forEach((badge) => {
++            Object.entries(badge[1].versions).forEach((v) => {
++              Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
+             });
+-            Chat.info.seventvBadges.forEach(badge => {
+-                badge.users.forEach(user => {
+-                    if (user === nick) {
+-                        var userBadge = {
+-                            description: badge.tooltip,
+-                            url: badge.urls[2][1]
+-                        };
+-                        if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
+-                    }
+-                });
 +          });
 +          TwitchAPI(
 +            'https://badges.twitch.tv/v1/badges/channels/' +
@@ -2772,12 +2784,12 @@ index 8b69758..f550d72 100644
 +                Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
 +              });
              });
--            Chat.info.seventvBadges.forEach(badge => {
+-            Chat.info.chatterinoBadges.forEach(badge => {
 -                badge.users.forEach(user => {
--                    if (user === nick) {
+-                    if (user === userId) {
 -                        var userBadge = {
 -                            description: badge.tooltip,
--                            url: badge.urls[2][1]
+-                            url: badge.image3 || badge.image2 || badge.image1
 -                        };
 -                        if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
 -                    }
@@ -2799,16 +2811,6 @@ index 8b69758..f550d72 100644
 +                  '/4';
 +              }
              });
--            Chat.info.chatterinoBadges.forEach(badge => {
--                badge.users.forEach(user => {
--                    if (user === userId) {
--                        var userBadge = {
--                            description: badge.tooltip,
--                            url: badge.image3 || badge.image2 || badge.image1
--                        };
--                        if (!Chat.info.userBadges[nick].includes(userBadge)) Chat.info.userBadges[nick].push(userBadge);
--                    }
--                });
 +          });
 +        },
 +      );
@@ -2859,7 +2861,86 @@ index 8b69758..f550d72 100644
 +              color: tier.color,
 +            };
 +          });
-+        });
+         });
+-    },
+-
+-    write: function(nick, info, message) {
+-        if (info) {
+-            var $chatLine = $('<div></div>');
+-            $chatLine.addClass('chat_line');
+-            $chatLine.attr('data-nick', nick);
+-            $chatLine.attr('data-time', Date.now());
+-            $chatLine.attr('data-id', info.id);
+-            var $userInfo = $('<span></span>');
+-            $userInfo.addClass('user_info');
+-
+-            // Writing badges
+-            if (Chat.info.hideBadges) {
+-                if (typeof(info.badges) === 'string') {
+-                    info.badges.split(',').forEach(badge => {
+-                        var $badge = $('<img/>');
+-                        $badge.addClass('badge');
+-                        badge = badge.split('/');
+-                        $badge.attr('src', Chat.info.badges[badge[0] + ':' + badge[1]]);
+-                        $userInfo.append($badge);
+-                    });
+-                }
+-            } else {
+-                var badges = [];
+-                const priorityBadges = ['predictions', 'admin', 'global_mod', 'staff', 'twitchbot', 'broadcaster', 'moderator', 'vip'];
+-                if (typeof(info.badges) === 'string') {
+-                    info.badges.split(',').forEach(badge => {
+-                        badge = badge.split('/');
+-                        var priority = (priorityBadges.includes(badge[0]) ? true : false);
+-                        badges.push({
+-                            description: badge[0],
+-                            url: Chat.info.badges[badge[0] + ':' + badge[1]],
+-                            priority: priority
+-                        });
+-                    });
+-                }
+-                var $modBadge;
+-                badges.forEach(badge => {
+-                    if (badge.priority) {
+-                        var $badge = $('<img/>');
+-                        $badge.addClass('badge');
+-                        $badge.attr('src', badge.url);
+-                        if (badge.description === 'moderator') $modBadge = $badge;
+-                        $userInfo.append($badge);
+-                    }
+-                });
+-                if (Chat.info.userBadges[nick]) {
+-                    Chat.info.userBadges[nick].forEach(badge => {
+-                        var $badge = $('<img/>');
+-                        $badge.addClass('badge');
+-                        if (badge.color) $badge.css('background-color', badge.color);
+-                        if (badge.description === 'Bot' && info.mod === '1') {
+-                            $badge.css('background-color', 'rgb(0, 173, 3)');
+-                            $modBadge.remove();
+-                        }
+-                        $badge.attr('src', badge.url);
+-                        $userInfo.append($badge);
+-                    });
+-                }
+-                badges.forEach(badge => {
+-                    if (!badge.priority) {
+-                        var $badge = $('<img/>');
+-                        $badge.addClass('badge');
+-                        $badge.attr('src', badge.url);
+-                        $userInfo.append($badge);
+-                    }
+-                });
+-            }
+-
+-            // Writing username
+-            var $username = $('<span></span>');
+-            $username.addClass('nick');
+-            if (typeof(info.color) === 'string') {
+-                if (tinycolor(info.color).getBrightness() <= 50) var color = tinycolor(info.color).lighten(30);
+-                else var color = info.color;
+-            } else {
+-                const twitchColors = ["#FF0000", "#0000FF", "#008000", "#B22222", "#FF7F50", "#9ACD32", "#FF4500", "#2E8B57", "#DAA520", "#D2691E", "#5F9EA0", "#1E90FF", "#FF69B4", "#8A2BE2", "#00FF7F"];
+-                var color = twitchColors[nick.charCodeAt(0) % 15];
 +      });
 +
 +      callback(true);
@@ -3019,7 +3100,7 @@ index 8b69758..f550d72 100644
 +              description: badge[0],
 +              url: Chat.info.badges[badge[0] + ':' + badge[1]],
 +              priority: priority,
-             });
++            });
 +          });
 +        }
 +        var $modBadge;
@@ -3031,86 +3112,7 @@ index 8b69758..f550d72 100644
 +            if (badge.description === 'moderator') $modBadge = $badge;
 +            $userInfo.append($badge);
 +          }
-         });
--    },
--
--    write: function(nick, info, message) {
--        if (info) {
--            var $chatLine = $('<div></div>');
--            $chatLine.addClass('chat_line');
--            $chatLine.attr('data-nick', nick);
--            $chatLine.attr('data-time', Date.now());
--            $chatLine.attr('data-id', info.id);
--            var $userInfo = $('<span></span>');
--            $userInfo.addClass('user_info');
--
--            // Writing badges
--            if (Chat.info.hideBadges) {
--                if (typeof(info.badges) === 'string') {
--                    info.badges.split(',').forEach(badge => {
--                        var $badge = $('<img/>');
--                        $badge.addClass('badge');
--                        badge = badge.split('/');
--                        $badge.attr('src', Chat.info.badges[badge[0] + ':' + badge[1]]);
--                        $userInfo.append($badge);
--                    });
--                }
--            } else {
--                var badges = [];
--                const priorityBadges = ['predictions', 'admin', 'global_mod', 'staff', 'twitchbot', 'broadcaster', 'moderator', 'vip'];
--                if (typeof(info.badges) === 'string') {
--                    info.badges.split(',').forEach(badge => {
--                        badge = badge.split('/');
--                        var priority = (priorityBadges.includes(badge[0]) ? true : false);
--                        badges.push({
--                            description: badge[0],
--                            url: Chat.info.badges[badge[0] + ':' + badge[1]],
--                            priority: priority
--                        });
--                    });
--                }
--                var $modBadge;
--                badges.forEach(badge => {
--                    if (badge.priority) {
--                        var $badge = $('<img/>');
--                        $badge.addClass('badge');
--                        $badge.attr('src', badge.url);
--                        if (badge.description === 'moderator') $modBadge = $badge;
--                        $userInfo.append($badge);
--                    }
--                });
--                if (Chat.info.userBadges[nick]) {
--                    Chat.info.userBadges[nick].forEach(badge => {
--                        var $badge = $('<img/>');
--                        $badge.addClass('badge');
--                        if (badge.color) $badge.css('background-color', badge.color);
--                        if (badge.description === 'Bot' && info.mod === '1') {
--                            $badge.css('background-color', 'rgb(0, 173, 3)');
--                            $modBadge.remove();
--                        }
--                        $badge.attr('src', badge.url);
--                        $userInfo.append($badge);
--                    });
--                }
--                badges.forEach(badge => {
--                    if (!badge.priority) {
--                        var $badge = $('<img/>');
--                        $badge.addClass('badge');
--                        $badge.attr('src', badge.url);
--                        $userInfo.append($badge);
--                    }
--                });
--            }
--
--            // Writing username
--            var $username = $('<span></span>');
--            $username.addClass('nick');
--            if (typeof(info.color) === 'string') {
--                if (tinycolor(info.color).getBrightness() <= 50) var color = tinycolor(info.color).lighten(30);
--                else var color = info.color;
--            } else {
--                const twitchColors = ["#FF0000", "#0000FF", "#008000", "#B22222", "#FF7F50", "#9ACD32", "#FF4500", "#2E8B57", "#DAA520", "#D2691E", "#5F9EA0", "#1E90FF", "#FF69B4", "#8A2BE2", "#00FF7F"];
--                var color = twitchColors[nick.charCodeAt(0) % 15];
++        });
 +        if (Chat.info.userBadges[nick]) {
 +          Chat.info.userBadges[nick].forEach((badge) => {
 +            var $badge = $('<img/>');
