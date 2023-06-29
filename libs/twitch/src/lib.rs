@@ -269,7 +269,6 @@ impl UserPool {
         println!("Downloading pool");
         println!("Downloading pool");
 
-        // TODO: Add ability to download all users
         let vips = TwitchVips::from_api(crate::api_url!(
             "channels/vips?broadcaster_id={user_id}&first=100"
         ))
