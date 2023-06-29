@@ -4,25 +4,32 @@ use actix_web::{HttpRequest, HttpResponse};
 
 // TODO: Actual errors not just option returned
 
+#[derive(Debug, thiserror::Error)]
+pub enum RouteError {
+    #[error("Could not find the given path")]
+    NotFound(#[from] std::io::Error),
+    #[allow(dead_code)]
+    #[error("Could not find the given path, in included files")]
+    NotIncluded,
+}
+
 #[cfg(debug_assertions)]
-fn get_file(path: &str) -> Option<Vec<u8>> {
+fn get_file(path: &str) -> Result<Vec<u8>, RouteError> {
     use std::{env, fs};
 
-    let chat_dir = env::current_dir()
-        .expect("valid current dir")
-        .join("..")
-        .join("chat");
+    let chat_dir = env::current_dir()?.join("..").join("chat");
     let path = chat_dir.join(path);
-    let contents = fs::read_to_string(path).expect("valid contents");
+    let contents = fs::read(path)?;
 
-    Some(contents.into_bytes())
+    Ok(contents)
 }
 
 #[cfg(not(debug_assertions))]
-fn get_file(path: &str) -> Option<Vec<u8>> {
-    include_dir::include_dir!("chat")
-        .get_file(path)
-        .map(|file| file.contents())
+fn get_file(path: &str) -> Result<Vec<u8>, RouteError> {
+    match include_dir::include_dir!("chat").get_file(path) {
+        Some(file) => Ok(file.contents().to_vec()),
+        None => Err(RouteError::NotIncluded),
+    }
 }
 
 // User follows reference: https://dev.twitch.tv/docs/api/reference#get-users-follows
@@ -59,7 +66,7 @@ async fn twitch(req: HttpRequest) -> HttpResponse {
         }
     };
 
-    if let Some(path_contents) = get_file(path) {
+    if let Ok(path_contents) = get_file(path) {
         let contents = {
             let mut contents: Vec<u8> = vec![];
             if path.contains("script.js") {
