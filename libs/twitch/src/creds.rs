@@ -35,11 +35,11 @@ impl Credentials {
     pub async fn init() -> anyhow::Result<()> {
         let mut creds = Credentials::read();
 
+        dbg!(&creds);
+
         if creds.remain_30().await? {
             creds.refresh().await?;
         }
-
-        dbg!(&creds);
 
         creds.save()?;
 
@@ -99,6 +99,13 @@ impl Credentials {
             .await?
             .json()
             .await?;
+
+        let status = response["status"].as_u64().expect("valid status");
+
+        if (200..300).contains(&status) {
+            dbg!(response);
+            anyhow::bail!("Found non 200 status: {}", status);
+        }
 
         let expires_in = response["expires_in"].as_u64().ok_or_else(|| {
             anyhow::anyhow!("Could not parse expires_in from response: {:?}", response)
