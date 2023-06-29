@@ -112,7 +112,7 @@ impl std::fmt::Display for Command {
 
                 // Only embed the username if it is not "random"
                 if username != "random" {
-                    write!(f, ", {username}")?;
+                    write!(f, ", \"{username}\"")?;
                 }
 
                 write!(f, ")")
