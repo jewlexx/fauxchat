@@ -37,8 +37,15 @@ impl Credentials {
 
         dbg!(&creds);
 
-        if creds.remain_30().await? {
+        if !matches!(creds.remain_30().await, Ok(false)) {
+            tracing::debug!("Attempting to refresh token");
             creds.refresh().await?;
+        }
+
+        if !matches!(creds.remain_30().await, Ok(false)) {
+            anyhow::bail!(
+                "Twitch API token not working for whatever reason. Refresh did not work :("
+            );
         }
 
         creds.save()?;
@@ -100,10 +107,11 @@ impl Credentials {
             .json()
             .await?;
 
+        dbg!(&response);
+
         let status = response["status"].as_u64().expect("valid status");
 
         if (200..300).contains(&status) {
-            dbg!(response);
             anyhow::bail!("Found non 200 status: {}", status);
         }
 
