@@ -1,7 +1,4 @@
-use std::{
-    path::PathBuf,
-    time::{Duration, SystemTime},
-};
+use std::{path::PathBuf, time::Duration};
 
 use anyhow::Context;
 use const_format::formatcp;
@@ -43,10 +40,10 @@ impl Credentials {
             creds.refresh().await?;
         }
 
-        if (creds
+        if creds
             .remain_30()
             .await
-            .context("Twitch API token not working for whatever reason. Refresh did not work :(")?)
+            .context("Twitch API token not working for whatever reason. Refresh did not work :(")?
         {
             anyhow::bail!("Could not refresh API token")
         }

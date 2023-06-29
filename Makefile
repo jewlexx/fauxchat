@@ -24,6 +24,10 @@ commit:
 pool:
 	cargo r -p twitch_api
 
+check:
+	cargo check
+	cargo clippy
+
 build: pool
 	cd app && pnpm tauri build
 
