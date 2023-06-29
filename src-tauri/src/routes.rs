@@ -1,10 +1,26 @@
 use std::path::PathBuf;
 
 use actix_web::{HttpRequest, HttpResponse};
-use include_dir::{include_dir, Dir};
 
-// TODO: Use local files in debug builds
-static CHAT_DIR: Dir<'_> = include_dir!("chat");
+// TODO: Actual errors not just option returned
+
+#[cfg(debug_assertions)]
+fn get_file(path: &str) -> Option<Vec<u8>> {
+    use std::{env, fs};
+
+    let chat_dir = env::current_dir().expect("valid current dir").join("chat");
+    let path = chat_dir.join(path);
+    let contents = fs::read_to_string(path).expect("valid contents");
+
+    Some(contents.into_bytes())
+}
+
+#[cfg(not(debug_assertions))]
+fn get_file(path: &str) -> Option<Vec<u8>> {
+    include_dir::include_dir!("chat")
+        .get_file(path)
+        .map(|file| file.contents())
+}
 
 // User follows reference: https://dev.twitch.tv/docs/api/reference#get-users-follows
 // And to get user id in the first place: https://dev.twitch.tv/docs/api/reference#get-users
@@ -40,9 +56,8 @@ async fn twitch(req: HttpRequest) -> HttpResponse {
         }
     };
 
-    if let Some(file) = CHAT_DIR.get_file(path) {
+    if let Some(path_contents) = get_file(path) {
         let contents = {
-            let path_contents = file.contents();
             let mut contents: Vec<u8> = vec![];
             if path.contains("script.js") {
                 let prefix = format!(
@@ -67,7 +82,7 @@ const PORT = '{}';
 
         HttpResponse::Ok().content_type(mime).body(contents)
     } else {
-        let notfound_page = CHAT_DIR.get_file("404.html").expect("404 page").contents();
+        let notfound_page = get_file("404.html").expect("404 page");
         HttpResponse::NotFound()
             .content_type("text/html")
             .body(notfound_page)
