@@ -49,6 +49,8 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
         println!("Found a message");
         // Skip any comments or empty lines
 
+        let delay = cmd.get_delay();
+
         debug!("Sending message");
 
         debug!("{:?}", cmd);
