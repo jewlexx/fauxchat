@@ -2201,10 +2201,10 @@ index e333d72..0000000
 -});
 \ No newline at end of file
 diff --git a/v2/script.js b/v2/script.js
-index 8b69758..0757f3d 100644
+index 8b69758..17c1ac1 100644
 --- a/v2/script.js
 +++ b/v2/script.js
-@@ -1,558 +1,870 @@
+@@ -1,558 +1,871 @@
 -(function($) { // Thanks to BrunoLM (https://stackoverflow.com/a/3855394)
 -    $.QueryString = (function(paramsArray) {
 -        let params = {};
@@ -2760,8 +2760,9 @@ index 8b69758..0757f3d 100644
 +      TwitchAPI('https://api.twitch.tv/helix/chat/badges/global').done(
 +        function (global) {
 +          global.data.forEach((badge) => {
-+            Object.entries(badge.versions).forEach((v) => {
-+              Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
++            badge.versions.forEach((v) => {
++              console.log(badge.set_id + ':' + v.id);
++              Chat.info.badges[badge.set_id + ':' + v.id] = v.image_url_4x;
              });
 -            Chat.info.seventvBadges.forEach(badge => {
 -                badge.users.forEach(user => {
@@ -2775,13 +2776,13 @@ index 8b69758..0757f3d 100644
 -                });
 +          });
 +          TwitchAPI(
-+            'https://badges.twitch.tv/v1/badges/channels/' +
-+              encodeURIComponent(Chat.info.channelID) +
-+              '/display',
++            'https://api.twitch.tv/helix/chat/badges/?broadcaster_id=' +
++              encodeURIComponent(Chat.info.channelID),
 +          ).done(function (channel) {
-+            Object.entries(channel.badge_sets).forEach((badge) => {
-+              Object.entries(badge[1].versions).forEach((v) => {
-+                Chat.info.badges[badge[0] + ':' + v[0]] = v[1].image_url_4x;
++            channel.data.forEach((badge) => {
++              badge.versions.forEach((v) => {
++                console.log(badge.set_id + ':' + v.id);
++                Chat.info.badges[badge.set_id + ':' + v.id] = v.image_url_4x;
 +              });
              });
 -            Chat.info.chatterinoBadges.forEach(badge => {
