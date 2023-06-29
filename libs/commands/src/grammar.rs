@@ -24,7 +24,7 @@ impl CommandInfo {
         match cmd_name.to_lowercase().as_str() {
             "send" => Ok(CommandInfo {
                 name: "send",
-                arg_count: 3,
+                arg_count: 4,
             }),
             "sleep" => Ok(CommandInfo {
                 name: "sleep",

@@ -45,8 +45,16 @@ pub enum Command {
     Sleep { delay: u64 },
 }
 
+fn parse_str_lit(lit: &str) -> String {
+    let parsed = litrs::StringLit::parse(lit).expect("valid string literal");
+    let value = parsed.value();
+
+    value.to_string()
+}
+
 impl Command {
     pub fn from_parts(parts: &[&str]) -> Result<Command> {
+        dbg!(&parts);
         let cmd_name = parts[0].to_lowercase();
         let cmd_info = CommandInfo::from_name(&cmd_name)?;
         match cmd_info.name {
@@ -54,13 +62,8 @@ impl Command {
                 delay: parts[1].parse()?,
             }),
             "send" => Ok(Command::Send {
-                message: {
-                    let arg = parts[1].to_string();
-                    let lit = litrs::StringLit::parse(arg.as_str()).expect("valid string literal");
-                    let value = lit.value();
-                    value.to_string()
-                },
-                username: "random".to_string(),
+                message: parse_str_lit(parts[1]),
+                username: parse_str_lit(parts.get(4).copied().unwrap_or("\"random\"")),
                 count: parts[2].parse()?,
                 delay: parts[3].parse()?,
             }),
