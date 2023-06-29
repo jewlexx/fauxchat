@@ -62,6 +62,7 @@ impl Credentials {
 
             Ok(toml::from_str(&file_contents)?)
         } else {
+            // TODO: Don't include credentials at build time
             let client_id = env!("TWITCH_CLIENT_ID").to_string();
             let client_secret = env!("TWITCH_CLIENT_SECRET").to_string();
             let user_id = env!("TWITCH_USER_ID").to_string();
