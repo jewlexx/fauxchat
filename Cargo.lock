@@ -4088,6 +4088,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "thiserror",
  "tokio",
  "toml 0.7.5",
  "tracing",

@@ -10,6 +10,16 @@ mod decl;
 
 pub use decl::Credentials;
 
+#[derive(Debug, thiserror::Error)]
+pub enum CredentialsError {
+    #[error("Could not find credentials file")]
+    IO(#[from] std::io::Error),
+    #[error("Could not determine a valid path for the given project dir")]
+    InvalidProjDir,
+}
+
+type Result<T> = std::result::Result<T, CredentialsError>;
+
 #[derive(Debug, Deserialize)]
 pub struct AccessToken {
     access_token: String,
@@ -83,11 +93,12 @@ impl Credentials {
         }
     }
 
-    pub fn get_path() -> anyhow::Result<PathBuf> {
+    pub fn get_path() -> Result<PathBuf> {
         use std::fs::create_dir_all;
 
-        let dir = directories::ProjectDirs::from("com", "jewelexx", "FauxChat")
-            .unwrap_or_else(|| unimplemented!());
+        let Some(dir) = directories::ProjectDirs::from("com", "jewelexx", "FauxChat") else {
+            return Err(CredentialsError::InvalidProjDir);
+        };
 
         let data_dir = dir.data_dir();
 
