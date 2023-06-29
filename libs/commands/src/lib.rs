@@ -123,3 +123,31 @@ impl std::fmt::Display for Command {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_command_to_string() {
+        let dest = "send(\"Hello, World!\", 3, 1000)";
+        let cmd = Command::Send {
+            message: String::from("Hello, World!"),
+            username: String::from("random"),
+            count: 3,
+            delay: 1000,
+        };
+
+        assert_eq!(cmd.to_string(), dest);
+
+        let dest = "send(\"Hello, World!\", 15, 10, \"justinfan\")";
+        let cmd = Command::Send {
+            message: String::from("Hello, World!"),
+            username: String::from("justinfan"),
+            count: 15,
+            delay: 10,
+        };
+
+        assert_eq!(cmd.to_string(), dest);
+    }
+}

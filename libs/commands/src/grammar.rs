@@ -67,7 +67,7 @@ impl CommandsParser {
         let mut args = Vec::with_capacity(cmd_info.arg_count);
 
         for _ in 0..cmd_info.arg_count {
-            let part = parts.next().unwrap();
+            let Some(part) = parts.next() else { break; };
             assert_eq!(part.as_rule(), Rule::command_argument);
             args.push(part.as_str());
         }
