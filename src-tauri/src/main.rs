@@ -6,6 +6,7 @@
 use std::path::PathBuf;
 
 use actix_web::{web, App, HttpServer};
+use commands::Command;
 use crossbeam::channel::{unbounded, Sender};
 use once_cell::sync::OnceCell;
 use tokio::{fs::File, io::AsyncReadExt};
@@ -20,9 +21,9 @@ mod routes;
 #[macro_use]
 extern crate tracing;
 
-static mut TX: OnceCell<Sender<irc::SingleCommand>> = OnceCell::new();
+static mut TX: OnceCell<Sender<Command>> = OnceCell::new();
 
-fn ready_message(msg: irc::SingleCommand) {
+fn ready_message(msg: Command) {
     let tx = unsafe { TX.wait() };
 
     tx.send(msg).expect("connected channel. receiver dropped?");

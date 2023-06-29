@@ -16,11 +16,9 @@ pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpRes
     dbg!(resp)
 }
 
-pub type SingleCommand = (Command, String);
-
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
-pub fn send_messages(receiver: &Receiver<SingleCommand>) {
+pub fn send_messages(receiver: &Receiver<Command>) {
     use std::{fs::OpenOptions, io::Write};
 
     let file_name = {
@@ -45,7 +43,7 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
         .unwrap();
 
     // While loop will exit once connection is closed
-    while let Ok((cmd, username)) = receiver.recv() {
+    while let Ok(cmd) = receiver.recv() {
         println!("Found a message");
         // Skip any comments or empty lines
 
@@ -71,6 +69,7 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
         match cmd {
             Command::Send {
                 ref message,
+                ref username,
                 count,
                 delay: _,
             } => {
@@ -83,7 +82,7 @@ pub fn send_messages(receiver: &Receiver<SingleCommand>) {
                         if username == "random" {
                             TwitchUser::random()
                         } else {
-                            TwitchUser::from_username(&username)
+                            TwitchUser::from_username(username)
                         }
                     };
 

@@ -37,6 +37,7 @@ pub enum Command {
     /// Sends the given message the given number of times
     Send {
         message: String,
+        username: String,
         count: usize,
         delay: u64,
     },
@@ -44,21 +45,26 @@ pub enum Command {
     Sleep { delay: u64 },
 }
 
+fn parse_str_lit(lit: &str) -> String {
+    let parsed = litrs::StringLit::parse(lit).expect("valid string literal");
+    let value = parsed.value();
+
+    value.to_string()
+}
+
 impl Command {
     pub fn from_parts(parts: &[&str]) -> Result<Command> {
-        let cmd_name = parts[0].to_lowercase();
-        let cmd_info = CommandInfo::from_name(&cmd_name)?;
+        let cmd_info = {
+            let cmd_name = parts[0].to_lowercase();
+            CommandInfo::from_name(&cmd_name)?
+        };
         match cmd_info.name {
             "sleep" => Ok(Command::Sleep {
                 delay: parts[1].parse()?,
             }),
             "send" => Ok(Command::Send {
-                message: {
-                    let arg = parts[1].to_string();
-                    let lit = litrs::StringLit::parse(arg.as_str()).expect("valid string literal");
-                    let value = lit.value();
-                    value.to_string()
-                },
+                message: parse_str_lit(parts[1]),
+                username: parse_str_lit(parts.get(4).copied().unwrap_or("\"random\"")),
                 count: parts[2].parse()?,
                 delay: parts[3].parse()?,
             }),
@@ -73,14 +79,6 @@ impl Command {
         };
 
         Duration::from_millis(delay_ms)
-    }
-
-    #[must_use]
-    pub fn get_count(&self) -> usize {
-        match self {
-            Command::Send { count, .. } => *count,
-            Command::Sleep { .. } => 1,
-        }
     }
 }
 
@@ -99,14 +97,50 @@ impl std::fmt::Display for Command {
         match self {
             Command::Send {
                 message,
+                username,
                 count,
                 delay,
             } => {
-                write!(f, "send(\"{message}\", {count}, {delay})")
+                write!(f, "send(\"{message}\", {count}, {delay}")?;
+
+                // Only embed the username if it is not "random"
+                if username != "random" {
+                    write!(f, ", \"{username}\"")?;
+                }
+
+                write!(f, ")")
             }
             Command::Sleep { delay } => {
                 write!(f, "sleep({delay})")
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_command_to_string() {
+        let dest = "send(\"Hello, World!\", 3, 1000)";
+        let cmd = Command::Send {
+            message: String::from("Hello, World!"),
+            username: String::from("random"),
+            count: 3,
+            delay: 1000,
+        };
+
+        assert_eq!(cmd.to_string(), dest);
+
+        let dest = "send(\"Hello, World!\", 15, 10, \"justinfan\")";
+        let cmd = Command::Send {
+            message: String::from("Hello, World!"),
+            username: String::from("justinfan"),
+            count: 15,
+            delay: 10,
+        };
+
+        assert_eq!(cmd.to_string(), dest);
     }
 }

@@ -30,14 +30,12 @@ impl serde::Serialize for CommandError {
 type Result<T> = std::result::Result<T, CommandError>;
 
 #[tauri::command]
-pub fn invoke_command(command: &str, username: Option<&str>) -> Result<()> {
+pub fn invoke_command(command: &str) -> Result<()> {
     info!("Invoking command: {}", command);
-
-    let username = username.unwrap_or("random").to_string();
 
     let parsed = Command::try_from(command.to_string())?;
 
-    ready_message((parsed, username));
+    ready_message(parsed);
 
     Ok(())
 }
@@ -52,7 +50,7 @@ pub fn load_file(path: &str) -> Result<()> {
 
         // TODO: Replace random with actual user-defined username
         // TODO: (preferably implement a way to provide username in the command)
-        ready_message((parsed, "random".to_string()));
+        ready_message(parsed);
     }
 
     Ok(())
@@ -64,11 +62,12 @@ pub fn send_message(message: &str, username: &str, count: usize, delay: u64) {
 
     let command = Command::Send {
         message: message.to_string(),
+        username: username.to_string(),
         count,
         delay,
     };
 
-    ready_message((command, username.to_string()));
+    ready_message(command);
 }
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>

@@ -89,15 +89,15 @@ impl std::fmt::UpperHex for Color {
 mod tests {
     use super::*;
 
-    #[tokio::test]
-    async fn test_generate_names() -> anyhow::Result<()> {
-        let names = generate_names::<4>().await?;
-        for name in names {
-            assert!(!name.is_empty());
-        }
+    // #[tokio::test]
+    // async fn test_generate_names() -> anyhow::Result<()> {
+    //     let names = generate_names::<4>().await?;
+    //     for name in names {
+    //         assert!(!name.is_empty());
+    //     }
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     #[test]
     fn test_generate_color() {

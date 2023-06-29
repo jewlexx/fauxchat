@@ -24,7 +24,7 @@ impl CommandInfo {
         match cmd_name.to_lowercase().as_str() {
             "send" => Ok(CommandInfo {
                 name: "send",
-                arg_count: 3,
+                arg_count: 4,
             }),
             "sleep" => Ok(CommandInfo {
                 name: "sleep",
@@ -67,7 +67,7 @@ impl CommandsParser {
         let mut args = Vec::with_capacity(cmd_info.arg_count);
 
         for _ in 0..cmd_info.arg_count {
-            let part = parts.next().unwrap();
+            let Some(part) = parts.next() else { break; };
             assert_eq!(part.as_rule(), Rule::command_argument);
             args.push(part.as_str());
         }
@@ -93,6 +93,7 @@ mod tests {
         };
         let act = Command::Send {
             message: String::from("Message Here"),
+            username: String::from("random"),
             count: 10,
             delay: 10,
         };
