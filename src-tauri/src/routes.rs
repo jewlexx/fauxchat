@@ -8,7 +8,10 @@ use actix_web::{HttpRequest, HttpResponse};
 fn get_file(path: &str) -> Option<Vec<u8>> {
     use std::{env, fs};
 
-    let chat_dir = env::current_dir().expect("valid current dir").join("chat");
+    let chat_dir = env::current_dir()
+        .expect("valid current dir")
+        .join("..")
+        .join("chat");
     let path = chat_dir.join(path);
     let contents = fs::read_to_string(path).expect("valid contents");
 
