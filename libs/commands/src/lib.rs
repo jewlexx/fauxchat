@@ -54,8 +54,10 @@ fn parse_str_lit(lit: &str) -> String {
 
 impl Command {
     pub fn from_parts(parts: &[&str]) -> Result<Command> {
-        let cmd_name = parts[0].to_lowercase();
-        let cmd_info = CommandInfo::from_name(&cmd_name)?;
+        let cmd_info = {
+            let cmd_name = parts[0].to_lowercase();
+            CommandInfo::from_name(&cmd_name)?
+        };
         match cmd_info.name {
             "sleep" => Ok(Command::Sleep {
                 delay: parts[1].parse()?,
@@ -77,14 +79,6 @@ impl Command {
         };
 
         Duration::from_millis(delay_ms)
-    }
-
-    #[must_use]
-    pub fn get_count(&self) -> usize {
-        match self {
-            Command::Send { count, .. } => *count,
-            Command::Sleep { .. } => 1,
-        }
     }
 }
 
