@@ -20,7 +20,9 @@ actix-web-actors = "4.2.0"
 tracing-subscriber = "0.3.17"
 crossbeam = "0.8.2"
 include_dir = "0.7.3"
+time = "0.3.22"
 
+thiserror = { workspace = true }
 rayon = { workspace = true }
 reqwest = { workspace = true }
 tracing = { workspace = true }
@@ -36,8 +38,7 @@ rand = { workspace = true }
 twitch_api = { path = "../libs/twitch" }
 usergen = { path = "../libs/usergen" }
 commands = { path = "../libs/commands" }
-time = "0.3.22"
-thiserror = "1.0.40"
+lock = { path = "../libs/lock" }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
