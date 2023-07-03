@@ -38,6 +38,14 @@ async fn main() -> anyhow::Result<()> {
         .with_max_level(tracing::Level::DEBUG)
         .init();
 
+    let mut lock = lock::Lock::init()?;
+    let guard = lock.try_lock();
+
+    if guard.is_err() {
+        eprintln!("Another instance is already running!");
+        std::process::exit(1);
+    }
+
     Credentials::init().await?;
 
     // Must be initialized after credentials
