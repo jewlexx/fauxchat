@@ -3,7 +3,7 @@
 #![warn(clippy::all, clippy::pedantic)]
 #![allow(clippy::unsafe_derive_deserialize, clippy::missing_errors_doc)]
 
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 
 use actix_web::{web, App, HttpServer};
 use commands::Command;
@@ -39,10 +39,18 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     let mut lock = lock::Lock::init()?;
-    let guard = lock.try_lock();
+    let guard = Arc::new(lock.try_lock());
 
     if guard.is_err() {
+        #[cfg(not(debug_assertions))]
+        tauri::api::dialog::blocking::message::<tauri::Wry>(
+            None,
+            "Already Running!",
+            "Another instance is already running! Close it before running FauxChat again.",
+        );
+
         eprintln!("Another instance is already running!");
+
         std::process::exit(1);
     }
 
@@ -96,6 +104,10 @@ async fn main() -> anyhow::Result<()> {
             tcmds::invoke_command,
             tcmds::load_file
         ])
+        // .setup(|app| {
+        //     let window = app.get_window("main").unwrap();
+        //     Ok(())
+        // })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     trace!("App closed");
