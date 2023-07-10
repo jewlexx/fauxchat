@@ -15,6 +15,11 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
+      # I somehow ran out of Github Actions storage (idrk what it's storing), hopefully this helps.
+      - name: Remove unnecessary files
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2.5.1
       - name: setup node
