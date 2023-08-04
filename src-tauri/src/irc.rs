@@ -64,8 +64,6 @@ pub fn send_messages(receiver: &Receiver<Command>) {
         // TODO: Add username to sent command
         writeln!(file, "end_pause({now})").unwrap();
 
-        writeln!(file, "{command_string}").unwrap();
-
         match cmd {
             Command::Send {
                 ref message,
@@ -86,6 +84,10 @@ pub fn send_messages(receiver: &Receiver<Command>) {
                         }
                     };
 
+                    writeln!(file, "send(\"{message}\", 1, 0, \"{}\")", user.name).unwrap();
+
+                    writeln!(file, "sleep({})", delay.as_millis()).unwrap();
+
                     let parsed = user.send_message(message);
 
                     for conn in RECIPIENTS.lock().iter() {
@@ -98,6 +100,7 @@ pub fn send_messages(receiver: &Receiver<Command>) {
                 }
             }
             Command::Sleep { delay: _ } => {
+                writeln!(file, "{command_string}").unwrap();
                 thread::sleep(delay);
             }
         }
