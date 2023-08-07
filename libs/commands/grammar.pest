@@ -10,7 +10,7 @@ string = ${ "\"" ~ inner ~ "\"" }
 
 number = { ASCII_DIGIT+ }
 
-range = { number ~ ".." ~ number }
+range = { number ~ "-" ~ number }
 
 command_action   = { ASCII_ALPHA+ }
 command_argument = { range | number | string }

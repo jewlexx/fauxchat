@@ -133,7 +133,7 @@ mod tests {
     fn test_parts_to_command() {
         // Test range
 
-        let command = Command::from_parts(&["send", "\"Hello World!\"", "1", "1..10"])
+        let command = Command::from_parts(&["send", "\"Hello World!\"", "1", "1-10"])
             .expect("successful conversion");
     }
 

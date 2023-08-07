@@ -17,7 +17,7 @@ pub trait AmountValue:
 
 #[derive(Debug, Error)]
 pub enum AmountError {
-    #[error("Found malformed input. Expected a single value, or two values, seperated by '..'")]
+    #[error("Found malformed input. Expected a single value, or two values, seperated by '-'")]
     MalformedInput,
 
     #[error("Could not parse value from the provided string")]
@@ -34,7 +34,7 @@ impl<T: AmountValue> FromStr for Amount<T> {
     type Err = AmountError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        if let Some((start, finish)) = s.split_once("..") {
+        if let Some((start, finish)) = s.split_once('-') {
             let start = start.parse().map_err(|_| AmountError::ParseError)?;
             let finish = finish.parse().map_err(|_| AmountError::ParseError)?;
 
@@ -79,18 +79,18 @@ mod tests {
     /// This was created to assure that `split_once` returned [`None`] when I thought it would
     #[test]
     fn test_split_once_option_semantics() {
-        let range = "1..2";
+        let range = "1-2";
 
-        assert!(range.split_once("..").is_some());
+        assert!(range.split_once('-').is_some());
 
         let not_range = "12";
 
-        assert!(not_range.split_once("..").is_none());
+        assert!(not_range.split_once('-').is_none());
     }
 
     #[test]
     fn test_range_parse() {
-        let range = "1..12";
+        let range = "1-12";
 
         let parsed_range: Amount<u8> = range.parse().unwrap();
 
