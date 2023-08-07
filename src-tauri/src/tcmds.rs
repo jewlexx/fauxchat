@@ -64,7 +64,7 @@ pub fn send_message(message: &str, username: &str, count: usize, delay: u64) {
         message: message.to_string(),
         username: username.to_string(),
         count,
-        delay,
+        delay: commands::amount::Amount::Single(delay),
     };
 
     ready_message(command);

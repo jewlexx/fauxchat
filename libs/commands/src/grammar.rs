@@ -82,7 +82,7 @@ impl CommandsParser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Command;
+    use crate::{amount, Command};
 
     #[test]
     fn test_parse() {
@@ -95,7 +95,7 @@ mod tests {
             message: String::from("Message Here"),
             username: String::from("random"),
             count: 10,
-            delay: 10,
+            delay: amount::Amount::Single(10),
         };
 
         assert_eq!(command, act);
