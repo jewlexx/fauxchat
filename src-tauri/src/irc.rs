@@ -1,4 +1,7 @@
-use std::{thread, time::UNIX_EPOCH};
+use std::{
+    thread,
+    time::{Duration, UNIX_EPOCH},
+};
 
 use actix::{prelude::*, Actor, AsyncContext, StreamHandler};
 use actix_web::{web, Error, HttpRequest, HttpResponse};
@@ -47,8 +50,6 @@ pub fn send_messages(receiver: &Receiver<Command>) {
         println!("Found a message");
         // Skip any comments or empty lines
 
-        let delay = cmd.get_delay();
-
         debug!("Sending message");
 
         debug!("{:?}", cmd);
@@ -69,7 +70,7 @@ pub fn send_messages(receiver: &Receiver<Command>) {
                 ref message,
                 ref username,
                 count,
-                delay: _,
+                delay,
             } => {
                 let conns = RECIPIENTS.lock().len();
                 debug!("{conns} connections");
@@ -83,6 +84,8 @@ pub fn send_messages(receiver: &Receiver<Command>) {
                             TwitchUser::from_username(username)
                         }
                     };
+
+                    let delay = Duration::from_millis(delay.get_value());
 
                     writeln!(file, "send(\"{message}\", 1, 0, \"{}\")", user.name).unwrap();
 
@@ -99,7 +102,8 @@ pub fn send_messages(receiver: &Receiver<Command>) {
                     thread::sleep(delay);
                 }
             }
-            Command::Sleep { delay: _ } => {
+            Command::Sleep { delay } => {
+                let delay = Duration::from_millis(delay);
                 writeln!(file, "{command_string}").unwrap();
                 thread::sleep(delay);
             }
