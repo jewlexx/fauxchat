@@ -15,6 +15,11 @@ with open(file_path, "r") as f:
     with open(file_path.replace(".cmdir", ".commands"), "w") as f2:
         for line in f:
             if not line.startswith("end_pause"):
+                if line.startswith("sleep"):
+                    # Should fix the end_pause delay including any sleeps
+                    delay = int(line.split("(", 1)[1].split(")", 1)[0])
+                    old_end -= delay
+
                 f2.write(line)
             else:
                 timestamp = int(line.split("(", 1)[1].split(")", 1)[0])
