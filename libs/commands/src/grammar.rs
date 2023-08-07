@@ -7,6 +7,8 @@ pub enum ParseError {
     ParsingError(String),
     #[error("The command provided was invalid. Found {0}")]
     InvalidCommand(String),
+    #[error("The command given was a comment")]
+    Comment,
 }
 
 pub type Result<T> = std::result::Result<T, ParseError>;
@@ -45,6 +47,10 @@ impl CommandsParser {
     /// # Panics
     /// - Will panic if the input is invalid.
     pub fn parse_parts(input: &str) -> Result<Vec<&str>> {
+        if CommandsParser::parse(Rule::comment_single, input).is_ok() {
+            return Err(ParseError::Comment);
+        }
+
         let mut ast = CommandsParser::parse(Rule::command_single, input)
             .map_err(|e| ParseError::ParsingError(e.to_string()))?;
 
