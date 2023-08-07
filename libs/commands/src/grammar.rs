@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn test_parse_comment() {
         let comment_error =
-            CommandsParser::parse_parts("# This is a comment").expect_err("error value");
+            CommandsParser::parse_parts("// This is a comment").expect_err("error value");
 
         assert_eq!(comment_error, ParseError::Comment);
     }
