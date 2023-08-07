@@ -3,6 +3,7 @@
 
 use std::{num::ParseIntError, time::Duration};
 
+use amount::Amount;
 use grammar::{CommandInfo, CommandsParser};
 use thiserror::Error;
 
@@ -11,12 +12,16 @@ extern crate pest_derive;
 
 pub mod grammar;
 
+pub mod amount;
+
 #[derive(Debug, Error)]
 pub enum CommandsError {
     #[error("The number provided was invalid")]
     InvalidNumber(#[from] ParseIntError),
     #[error("Failed to parse grammar: {0}")]
     GrammarError(#[from] grammar::ParseError),
+    #[error("Failed to parse Amount value")]
+    AmountError(#[from] amount::AmountError),
     #[error("Failed to parse Command from given String. Was given: {0}")]
     ParseCommand(String),
     #[error("No command was provided")]
@@ -39,11 +44,13 @@ pub enum Command {
         message: String,
         username: String,
         count: usize,
-        delay: u64,
+        delay: Amount<u64>,
     },
     /// Pauses for the given number of milliseconds
     Sleep { delay: u64 },
 }
+
+impl amount::AmountValue for u64 {}
 
 fn parse_str_lit(lit: &str) -> String {
     let parsed = litrs::StringLit::parse(lit).expect("valid string literal");
@@ -66,7 +73,7 @@ impl Command {
                 message: parse_str_lit(parts[1]),
                 username: parse_str_lit(parts.get(4).copied().unwrap_or("\"random\"")),
                 count: parts[2].parse()?,
-                delay: parts[3].parse()?,
+                delay: dbg!(parts[3]).parse()?,
             }),
             _ => unreachable!("Any invalid command error should have been caught above"),
         }
@@ -75,7 +82,8 @@ impl Command {
     #[must_use]
     pub fn get_delay(&self) -> Duration {
         let delay_ms = match self {
-            Command::Send { delay, .. } | Command::Sleep { delay } => *delay,
+            Command::Send { delay, .. } => delay.get_value(),
+            Command::Sleep { delay } => *delay,
         };
 
         Duration::from_millis(delay_ms)
@@ -122,13 +130,21 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_parts_to_command() {
+        // Test range
+
+        let command = Command::from_parts(&["send", "\"Hello World!\"", "1", "1..10"])
+            .expect("successful conversion");
+    }
+
+    #[test]
     fn test_command_to_string() {
         let dest = "send(\"Hello, World!\", 3, 1000)";
         let cmd = Command::Send {
             message: String::from("Hello, World!"),
             username: String::from("random"),
             count: 3,
-            delay: 1000,
+            delay: Amount::Single(1000),
         };
 
         assert_eq!(cmd.to_string(), dest);
@@ -138,7 +154,7 @@ mod tests {
             message: String::from("Hello, World!"),
             username: String::from("justinfan"),
             count: 15,
-            delay: 10,
+            delay: Amount::Single(10),
         };
 
         assert_eq!(cmd.to_string(), dest);
