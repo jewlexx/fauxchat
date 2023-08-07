@@ -45,6 +45,8 @@ pub fn send_messages(receiver: &Receiver<Command>) {
         .open(file_name)
         .unwrap();
 
+    // TODO: Maybe for longer running tasks, run it on a separate thread, so other messages can come in
+
     // While loop will exit once connection is closed
     while let Ok(cmd) = receiver.recv() {
         println!("Found a message");
