@@ -1,6 +1,6 @@
 use pest::Parser;
 
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum ParseError {
     // The string provided is the error message from pest
     #[error("{0}")]
@@ -125,5 +125,14 @@ mod tests {
 
         // // Ensure that we have exhausted the iterator
         // assert!(commands_iter.next().is_none());
+    }
+
+    #[test]
+    fn test_parse_comment() {
+        let comment_error = CommandsParser::parse_parts("# This is a comment")
+            .err()
+            .expect("error value");
+
+        assert_eq!(comment_error, ParseError::Comment);
     }
 }
