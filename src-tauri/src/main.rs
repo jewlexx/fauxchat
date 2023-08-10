@@ -9,6 +9,7 @@ use actix_web::{web, App, HttpServer};
 use commands::Command;
 use crossbeam::channel::{unbounded, Sender};
 use once_cell::sync::OnceCell;
+use time::macros::format_description;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing_subscriber::fmt::format::FmtSpan;
 
@@ -22,6 +23,19 @@ mod routes;
 extern crate tracing;
 
 static mut TX: OnceCell<Sender<Command>> = OnceCell::new();
+
+#[cfg(not(debug_assertions))]
+fn cmdir_dir() -> PathBuf {
+    directories::ProjectDirs::from("com", "jewelexx", "FauxChat")
+        .unwrap()
+        .cache_dir()
+        .to_path_buf()
+}
+
+#[cfg(debug_assertions)]
+fn cmdir_dir() -> PathBuf {
+    PathBuf::new()
+}
 
 fn ready_message(msg: Command) {
     let tx = unsafe { TX.wait() };
@@ -93,9 +107,36 @@ async fn main() -> anyhow::Result<()> {
 
     unsafe { TX.set(tx) }.unwrap();
 
-    let messages_thread = tokio::spawn(async move {
-        irc::send_messages(&rx);
-    });
+    let cmdir_path = {
+        let folder = cmdir_dir();
+
+        std::fs::create_dir_all(&folder).expect("created cmdir directory");
+
+        let file_name = {
+            let now: time::OffsetDateTime = std::time::SystemTime::now().into();
+
+            let formatted_date = now
+                .format(format_description!(
+                    "[year]-[month]-[day]-[hour]-[minute]-[second]"
+                ))
+                .unwrap();
+
+            // Save as .cmdir file (short for command intermediate representation)
+            // This file will require parsing to have the "end_pause" converted into regular sleep commands
+            formatted_date + ".cmdir"
+        };
+
+        folder.join(file_name)
+    };
+
+    let messages_thread = {
+        let path = cmdir_path.clone();
+        tokio::spawn(async move {
+            irc::send_messages(&rx, path);
+        })
+    };
+
+    // TODO: Parse cmdir into .commands
 
     trace!("Running app");
     tauri::Builder::default()

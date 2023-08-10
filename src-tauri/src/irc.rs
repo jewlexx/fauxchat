@@ -11,7 +11,6 @@ use actix_web_actors::ws;
 use commands::Command;
 use crossbeam::channel::Receiver;
 use parking_lot::Mutex;
-use time::macros::format_description;
 use twitch_api::TwitchUser;
 
 #[allow(clippy::unused_async, clippy::needless_pass_by_value)]
@@ -22,43 +21,14 @@ pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpRes
 
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
-#[cfg(not(debug_assertions))]
-fn cmdir_dir() -> PathBuf {
-    directories::ProjectDirs::from("com", "jewelexx", "FauxChat")
-        .unwrap()
-        .cache_dir()
-        .to_path_buf()
-}
-
-#[cfg(debug_assertions)]
-fn cmdir_dir() -> PathBuf {
-    PathBuf::new()
-}
-
-pub fn send_messages(receiver: &Receiver<Command>) {
+pub fn send_messages(receiver: &Receiver<Command>, path: PathBuf) {
     use std::{fs::OpenOptions, io::Write};
-
-    std::fs::create_dir_all(cmdir_dir()).expect("created cmdir directory");
-
-    let file_name = {
-        let now: time::OffsetDateTime = std::time::SystemTime::now().into();
-
-        let formatted_date = now
-            .format(format_description!(
-                "[year]-[month]-[day]-[hour]-[minute]-[second]"
-            ))
-            .unwrap();
-
-        // Save as .cmdir file (short for command intermediate representation)
-        // This file will require parsing to have the "end_pause" converted into regular sleep commands
-        formatted_date + ".cmdir"
-    };
 
     let mut file = OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
-        .open(cmdir_dir().join(file_name))
+        .open(path)
         .unwrap();
 
     // TODO: Maybe for longer running tasks, run it on a separate thread, so other messages can come in
