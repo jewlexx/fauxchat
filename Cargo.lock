@@ -329,6 +329,7 @@ dependencies = [
  "anyhow",
  "commands",
  "crossbeam",
+ "directories",
  "include_dir",
  "lock",
  "once_cell",

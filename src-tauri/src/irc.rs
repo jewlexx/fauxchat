@@ -1,4 +1,5 @@
 use std::{
+    path::PathBuf,
     thread,
     time::{Duration, UNIX_EPOCH},
 };
@@ -21,6 +22,16 @@ pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpRes
 
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
+fn cmdir_dir() -> PathBuf {
+    #[cfg(not(debug_assertions))]
+    directories::ProjectDirs::from("com", "jewelexx", "FauxChat")
+        .unwrap()
+        .cache_dir();
+
+    #[cfg(debug_assertions)]
+    PathBuf::new()
+}
+
 pub fn send_messages(receiver: &Receiver<Command>) {
     use std::{fs::OpenOptions, io::Write};
 
@@ -42,7 +53,7 @@ pub fn send_messages(receiver: &Receiver<Command>) {
         .write(true)
         .append(true)
         .create(true)
-        .open(file_name)
+        .open(cmdir_dir().join(file_name))
         .unwrap();
 
     // TODO: Maybe for longer running tasks, run it on a separate thread, so other messages can come in
@@ -113,7 +124,7 @@ pub fn send_messages(receiver: &Receiver<Command>) {
 
         debug!("Message sent");
     }
-    debug!("Done sending messages");
+    error!("Done sending messages");
 }
 
 /// Chat server sends this messages to session

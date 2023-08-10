@@ -14,9 +14,6 @@ impl Lock {
     pub fn init() -> Result<Self, LockError> {
         let base_dirs = directories::BaseDirs::new().unwrap();
 
-        #[cfg(target_os = "linux")]
-        let dir = base_dirs.runtime_dir().unwrap();
-        #[cfg(not(target_os = "linux"))]
         let dir = base_dirs.cache_dir();
 
         let lock_path = dir.join("fauxchat.lock");
