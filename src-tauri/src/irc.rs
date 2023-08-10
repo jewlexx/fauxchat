@@ -22,18 +22,23 @@ pub async fn handle_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpRes
 
 pub static RECIPIENTS: Mutex<Vec<Recipient<Message>>> = Mutex::new(Vec::new());
 
+#[cfg(not(debug_assertions))]
 fn cmdir_dir() -> PathBuf {
-    #[cfg(not(debug_assertions))]
     directories::ProjectDirs::from("com", "jewelexx", "FauxChat")
         .unwrap()
-        .cache_dir();
+        .cache_dir()
+        .to_path_buf()
+}
 
-    #[cfg(debug_assertions)]
+#[cfg(debug_assertions)]
+fn cmdir_dir() -> PathBuf {
     PathBuf::new()
 }
 
 pub fn send_messages(receiver: &Receiver<Command>) {
     use std::{fs::OpenOptions, io::Write};
+
+    std::fs::create_dir_all(cmdir_dir()).expect("created cmdir directory");
 
     let file_name = {
         let now: time::OffsetDateTime = std::time::SystemTime::now().into();
