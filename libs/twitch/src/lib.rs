@@ -128,6 +128,16 @@ impl TwitchUser {
             is_sub: rng.gen(),
         }
     }
+
+    // pub fn randomize_properties(&mut self) {
+    //     use rand::Rng;
+
+    //     let mut rng = rand::thread_rng();
+
+    //     self.is_sub = rng.gen_range(1..1000) < 200;
+    //     self.is_vip = rng.gen_range(1..1000) < 50;
+    //     self.is_mod = rng.gen_range(1..1000) < ;
+    // }
 }
 
 pub struct Badges {
