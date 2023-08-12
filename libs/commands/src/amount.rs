@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use pest::Parser;
 use rand::Rng;
 use thiserror::Error;
 
@@ -22,6 +23,12 @@ pub enum AmountError {
 
     #[error("Could not parse value from the provided string")]
     ParseError,
+
+    #[error("Could not parse value from the provided string")]
+    PestError(#[from] pest::error::Error<super::grammar::Rule>),
+
+    #[error("Missing inputs")]
+    MissingInput,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -34,14 +41,33 @@ impl<T: AmountValue> FromStr for Amount<T> {
     type Err = AmountError;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        if let Some((start, finish)) = s.split_once('-') {
-            let start = start.parse().map_err(|_| AmountError::ParseError)?;
-            let finish = finish.parse().map_err(|_| AmountError::ParseError)?;
+        use super::grammar::{CommandsParser, Rule};
+
+        let result = CommandsParser::parse(Rule::amount, s)?;
+
+        let mut range = dbg!(result)
+            .next()
+            .ok_or(AmountError::MissingInput)?
+            .into_inner();
+
+        let start = range.next().ok_or(AmountError::MissingInput)?;
+
+        if let Some(end) = range.next() {
+            let start = start
+                .as_str()
+                .trim()
+                .parse()
+                .map_err(|_| AmountError::ParseError)?;
+            let finish = dbg!(end.as_str().trim())
+                .parse()
+                .map_err(|_| AmountError::ParseError)?;
 
             Ok(Amount::Range { start, finish })
         } else {
             Ok(Amount::Single(
-                s.parse().map_err(|_| AmountError::ParseError)?,
+                dbg!(start.as_str().trim())
+                    .parse()
+                    .map_err(|_| AmountError::ParseError)?,
             ))
         }
     }
@@ -93,6 +119,18 @@ mod tests {
         let range = "1-12";
 
         let parsed_range: Amount<u8> = range.parse().unwrap();
+
+        assert_eq!(
+            parsed_range,
+            Amount::Range {
+                start: 1,
+                finish: 12,
+            }
+        );
+
+        let range_whitespace = "1 - 12";
+
+        let parsed_range: Amount<u8> = range_whitespace.parse().unwrap();
 
         assert_eq!(
             parsed_range,
