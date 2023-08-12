@@ -1,6 +1,8 @@
-$sideWidth: calc(50vw - 2rem);
-$sideHeight: calc(100vh - 2rem);
-$radius: 0.55rem;
+:root {
+  --sideWidth: calc(50vw - 2rem);
+  --sideHeight: calc(100vh - 2rem);
+  --radius: 0.55rem;
+}
 
 .container {
   margin: 0;
@@ -10,10 +12,10 @@ $radius: 0.55rem;
   display: flex;
 
   .chatContainer {
-    background-color: darken(#2f2f2f, 10%);
-    width: $sideWidth;
-    height: $sideHeight;
-    border-radius: $radius;
+    background-color: #161616;
+    width: var(--sideWidth);
+    height: var(--sideHeight);
+    border-radius: var(--radius);
 
     iframe {
       width: 100%;
@@ -25,9 +27,9 @@ $radius: 0.55rem;
 }
 
 .controls {
-  width: $sideWidth;
-  height: $sideHeight;
-  border-radius: $radius;
+  width: var(--sideWidth);
+  height: var(--sideHeight);
+  border-radius: var(--radius);
   display: flex;
   justify-content: center;
 

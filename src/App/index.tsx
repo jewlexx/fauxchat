@@ -4,7 +4,7 @@ import { FaFileImport } from 'react-icons/fa';
 import { invoke } from '@tauri-apps/api/tauri';
 import { open } from '@tauri-apps/api/dialog';
 import Chat from '../Chat';
-import styles from './index.module.scss';
+import styles from './index.module.css';
 
 // TODO: Fix badges
 
