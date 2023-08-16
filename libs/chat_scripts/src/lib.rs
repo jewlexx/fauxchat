@@ -1,6 +1,12 @@
-use std::{path::Path, rc::Rc};
+use std::{
+    path::Path,
+    rc::Rc,
+    sync::{Arc, OnceLock},
+};
 
-use deno_core::{error::AnyError, ModuleResolutionError, ModuleSpecifier};
+use deno_core::{error::AnyError, op, Extension, ModuleResolutionError, ModuleSpecifier};
+
+static CALLBACK: OnceLock<Arc<dyn Fn() + Send + Sync>> = OnceLock::new();
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -18,7 +24,9 @@ pub struct ChatScripts {
 }
 
 impl ChatScripts {
-    pub fn new() -> Self {
+    pub fn new(callback: impl Fn() + Send + Sync + 'static) -> Self {
+        CALLBACK.set(Arc::new(callback));
+
         Self {
             current_module: None,
         }
@@ -36,10 +44,18 @@ impl ChatScripts {
         Ok(())
     }
 
-    pub async fn run_js(&self, file_path: &str) -> std::error::Result<(), AnyError> {
-        let main_module = self.current_module.ok_or(Error::MissingModule)?;
+    pub async fn run_js(&self) -> std::result::Result<(), AnyError> {
+        let main_module = self.current_module.as_ref().ok_or(Error::MissingModule)?;
+
+        let chat_extensions = Extension {
+            name: "chat interactions",
+
+            ..Default::default()
+        };
+
         let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions {
             module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
+            extensions: vec![chat_extensions],
             ..Default::default()
         });
 
