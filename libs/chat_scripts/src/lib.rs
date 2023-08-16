@@ -15,6 +15,9 @@ pub enum Error {
 
     #[error("Please load the module using ChatScripts::load_module")]
     MissingModule,
+
+    #[error("Callback already set, maybe you have already created a ChatScripts struct?")]
+    CallbackSet,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -24,12 +27,14 @@ pub struct ChatScripts {
 }
 
 impl ChatScripts {
-    pub fn new(callback: impl Fn() + Send + Sync + 'static) -> Self {
-        CALLBACK.set(Arc::new(callback));
+    pub fn new(callback: impl Fn() + Send + Sync + 'static) -> Result<Self> {
+        CALLBACK
+            .set(Arc::new(callback))
+            .or_else(|| Error::CallbackSet);
 
-        Self {
+        Ok(Self {
             current_module: None,
-        }
+        })
     }
 
     pub fn load_module(&mut self, file_path: impl AsRef<Path>) -> Result<()> {
