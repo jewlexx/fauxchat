@@ -10,6 +10,16 @@ use deno_core::{error::AnyError, op, Extension, ModuleResolutionError, ModuleSpe
 
 static CALLBACK: OnceLock<Arc<dyn Fn() + Send + Sync>> = OnceLock::new();
 
+#[op]
+async fn op_send(
+    message: String,
+    count: usize,
+    delay: u64,
+    username: String,
+) -> Result<(), AnyError> {
+    todo!()
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("{0}")]
