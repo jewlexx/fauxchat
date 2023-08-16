@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 deno_core = "0.202.0"
+thiserror.workspace = true
 tokio.workspace = true

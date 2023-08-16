@@ -590,6 +590,7 @@ name = "chat_scripts"
 version = "0.1.0"
 dependencies = [
  "deno_core",
+ "thiserror",
  "tokio",
 ]
 
