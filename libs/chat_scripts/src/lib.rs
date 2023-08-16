@@ -1,3 +1,5 @@
+#![warn(clippy::all, clippy::pedantic)]
+
 use std::{
     path::Path,
     rc::Rc,
@@ -30,7 +32,7 @@ impl ChatScripts {
     pub fn new(callback: impl Fn() + Send + Sync + 'static) -> Result<Self> {
         CALLBACK
             .set(Arc::new(callback))
-            .or_else(|| Error::CallbackSet);
+            .map_err(|_| Error::CallbackSet)?;
 
         Ok(Self {
             current_module: None,
