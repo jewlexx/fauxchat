@@ -2,7 +2,7 @@
 members = ["libs/*", "src-tauri"]
 
 [workspace.dependencies]
-anyhow = "1.0.74"
+anyhow = "1.0.75"
 toml = "0.7.6"
 serde = { version = "1.0.183", features = ["derive"] }
 once_cell = { version = "1.18.0", features = ["parking_lot"] }
