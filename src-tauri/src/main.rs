@@ -73,8 +73,9 @@ async fn main() -> anyhow::Result<()> {
     // Must be initialized after credentials
     once_cell::sync::Lazy::force(&twitch_api::CLIENT);
 
-    let pool = if PathBuf::from("../pool.json").exists() {
-        let mut file = File::open("../pool.json").await?;
+    let pool = if PathBuf::from("pool.json").exists() {
+        println!("Using local user pool");
+        let mut file = File::open("pool.json").await?;
         let mut file_str = String::new();
         file.read_to_string(&mut file_str).await?;
         serde_json::from_str(&file_str)?
