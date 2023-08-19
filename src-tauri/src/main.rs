@@ -24,7 +24,7 @@ extern crate tracing;
 
 static mut TX: OnceCell<Sender<Command>> = OnceCell::new();
 
-#[cfg(not(debug_assertions))]
+// #[cfg(not(debug_assertions))]
 fn cmdir_dir() -> PathBuf {
     directories::ProjectDirs::from("com", "jewelexx", "FauxChat")
         .unwrap()
@@ -32,10 +32,10 @@ fn cmdir_dir() -> PathBuf {
         .to_path_buf()
 }
 
-#[cfg(debug_assertions)]
-fn cmdir_dir() -> PathBuf {
-    PathBuf::new()
-}
+// #[cfg(debug_assertions)]
+// fn cmdir_dir() -> PathBuf {
+//     PathBuf::new()
+// }
 
 fn ready_message(msg: Command) {
     let tx = unsafe { TX.wait() };
@@ -163,6 +163,8 @@ async fn main() -> anyhow::Result<()> {
     // Thread will be completed, as we closed the connection
     messages_thread.await?;
     trace!("Messages thread completed");
+
+    // TODO: Parse cmdir into regular cmd file
 
     Ok(())
 }
