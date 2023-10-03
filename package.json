@@ -29,6 +29,6 @@
     "postcss-load-config": "4.0.1",
     "postcss-preset-env": "9.1.4",
     "typescript": "5.2.2",
-    "vite": "4.4.9"
+    "vite": "4.4.10"
   }
 }
