@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 deno_core = "0.220.0"
+deno_runtime = "0.128.0"
 thiserror.workspace = true
 tokio.workspace = true

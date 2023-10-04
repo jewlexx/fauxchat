@@ -6,9 +6,10 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use deno_core::{
-    error::AnyError, Extension, MainWorker, ModuleResolutionError, ModuleSpecifier,
-    PermissionsContainer,
+use deno_core::{error::AnyError, FsModuleLoader, ModuleSpecifier};
+use deno_runtime::{
+    permissions::PermissionsContainer,
+    worker::{MainWorker, WorkerOptions},
 };
 
 static CALLBACK: OnceLock<Arc<dyn Fn() + Send + Sync>> = OnceLock::new();
@@ -47,7 +48,7 @@ impl ChatScripts {
     pub fn load_module(&mut self, file_path: impl AsRef<Path>) -> Result<()> {
         let module = {
             let path = deno_core::normalize_path(file_path);
-            deno_core::url::Url::from_file_path(&path)
+            ModuleSpecifier::from_file_path(&path)
                 .map_err(|()| ModuleResolutionError::InvalidPath(path))
         }?;
 
@@ -57,30 +58,17 @@ impl ChatScripts {
     }
 
     pub async fn run_js(&self) -> std::result::Result<(), AnyError> {
-        let main_module =
-            ModuleSpecifier::from_file_path(current_module.as_ref().ok_or(Error::MissingModule))?;
-
-        // let chat_extensions = Extension {
-        //     name: "chat extensions",
-        //     ops: ops::chat_commands::init_ops(),
-
-        //     ..Default::default()
-        // };
-
         let mut worker = MainWorker::bootstrap_from_options(
-            main_module.clone(),
+            self.current_module.clone(),
             PermissionsContainer::allow_all(),
+            WorkerOptions {
+                module_loader: Rc::new(FsModuleLoader),
+                extensions: vec![chat_commands::init_ops()],
+                ..Default::default()
+            },
         );
 
-        let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions {
-            module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
-            extensions: vec![chat_extensions],
-            ..Default::default()
-        });
-
-        let mod_id = js_runtime.load_main_module(&main_module, None).await?;
-        let result = js_runtime.mod_evaluate(mod_id);
-        js_runtime.run_event_loop(false).await?;
-        result.await?
+        worker.execute_main_module(&main_module).await?;
+        worker.run_event_loop(false).await?;
     }
 }
