@@ -1,15 +1,15 @@
-use deno_core::{error::AnyError, op, Op, OpDecl};
+use std::borrow::Cow;
 
-pub fn declarations() -> Vec<OpDecl> {
-    vec![op_send::DECL]
-}
+use deno_core::{error::AnyError, extension, op2, Op, OpDecl};
 
-#[op]
+extension!(chat_commands, ops = [op_send]);
+
+#[op2(async)]
 pub async fn op_send(
-    message: String,
-    count: usize,
-    delay: u64,
-    username: String,
+    #[string] message: String,
+    #[bigint] count: usize,
+    #[bigint] delay: u64,
+    #[string] username: String,
 ) -> Result<(), AnyError> {
     todo!()
 }

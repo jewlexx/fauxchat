@@ -6,7 +6,10 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use deno_core::{error::AnyError, Extension, ModuleResolutionError, ModuleSpecifier};
+use deno_core::{
+    error::AnyError, Extension, MainWorker, ModuleResolutionError, ModuleSpecifier,
+    PermissionsContainer,
+};
 
 static CALLBACK: OnceLock<Arc<dyn Fn() + Send + Sync>> = OnceLock::new();
 
@@ -54,14 +57,20 @@ impl ChatScripts {
     }
 
     pub async fn run_js(&self) -> std::result::Result<(), AnyError> {
-        let main_module = self.current_module.as_ref().ok_or(Error::MissingModule)?;
+        let main_module =
+            ModuleSpecifier::from_file_path(current_module.as_ref().ok_or(Error::MissingModule))?;
 
-        let chat_extensions = Extension {
-            name: "chat extensions",
-            ops: ops::declarations(),
+        // let chat_extensions = Extension {
+        //     name: "chat extensions",
+        //     ops: ops::chat_commands::init_ops(),
 
-            ..Default::default()
-        };
+        //     ..Default::default()
+        // };
+
+        let mut worker = MainWorker::bootstrap_from_options(
+            main_module.clone(),
+            PermissionsContainer::allow_all(),
+        );
 
         let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions {
             module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
