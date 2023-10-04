@@ -6,19 +6,11 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use deno_core::{error::AnyError, op, Extension, ModuleResolutionError, ModuleSpecifier};
+use deno_core::{error::AnyError,  Extension, ModuleResolutionError, ModuleSpecifier};
 
 static CALLBACK: OnceLock<Arc<dyn Fn() + Send + Sync>> = OnceLock::new();
 
-#[op]
-async fn op_send(
-    message: String,
-    count: usize,
-    delay: u64,
-    username: String,
-) -> Result<(), AnyError> {
-    todo!()
-}
+mod ops;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -64,11 +56,9 @@ impl ChatScripts {
     pub async fn run_js(&self) -> std::result::Result<(), AnyError> {
         let main_module = self.current_module.as_ref().ok_or(Error::MissingModule)?;
 
-        let chat_extensions = Extension {
-            name: "chat interactions",
-
-            ..Default::default()
-        };
+        let chat_extensions = Extension::builder("chat extensions")
+            .ops(ops::declarations())
+            .build();
 
         let mut js_runtime = deno_core::JsRuntime::new(deno_core::RuntimeOptions {
             module_loader: Some(Rc::new(deno_core::FsModuleLoader)),
