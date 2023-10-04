@@ -6,5 +6,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error> {
     let mut scripts = ChatScripts::new(|| {});
     scripts.load_module(main_module_path)?;
 
+    scripts.run_js().await?;
+
     Ok(())
 }
