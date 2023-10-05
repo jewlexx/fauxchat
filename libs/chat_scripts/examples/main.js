@@ -1,3 +1,3 @@
 console.log("pp");
 
-chat.send("poopy");
+fauxchat.send("poopy");
