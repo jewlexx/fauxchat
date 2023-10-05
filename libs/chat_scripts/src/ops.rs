@@ -12,5 +12,5 @@ pub async fn op_send(
     #[bigint] delay: u64,
     #[string] username: String,
 ) -> Result<(), AnyError> {
-    todo!()
+    unimplemented!()
 }

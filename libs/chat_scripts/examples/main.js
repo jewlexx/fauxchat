@@ -1,1 +1,3 @@
-console.log("pp")
+console.log("pp");
+
+chat.send("poopy");

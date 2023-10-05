@@ -69,6 +69,10 @@ impl ChatScripts {
             },
         );
 
+        worker.execute_script(
+            "[chat_scripts:runtime.js]",
+            deno_core::FastString::Static(include_str!("js/runtime.js")),
+        )?;
         worker.execute_main_module(module).await?;
         worker.run_event_loop(false).await?;
 
