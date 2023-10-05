@@ -1,5 +1,6 @@
 [workspace]
 members = ["libs/*", "src-tauri"]
+resolver = "2"
 
 [workspace.dependencies]
 anyhow = "1.0.74"

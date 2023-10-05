@@ -6,7 +6,8 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use deno_core::{error::AnyError, FsModuleLoader, ModuleSpecifier};
+use deno_core::{error::AnyError, FsModuleLoader, ModuleResolutionError, ModuleSpecifier};
+use deno_runtime::deno_core;
 use deno_runtime::{
     permissions::PermissionsContainer,
     worker::{MainWorker, WorkerOptions},
@@ -58,17 +59,19 @@ impl ChatScripts {
     }
 
     pub async fn run_js(&self) -> std::result::Result<(), AnyError> {
+        let module = self.current_module.as_ref().expect("loaded main module");
         let mut worker = MainWorker::bootstrap_from_options(
-            self.current_module.clone(),
+            module.clone(),
             PermissionsContainer::allow_all(),
             WorkerOptions {
-                module_loader: Rc::new(FsModuleLoader),
-                extensions: vec![chat_commands::init_ops()],
+                extensions: vec![ops::chat_commands::init_ops()],
                 ..Default::default()
             },
         );
 
-        worker.execute_main_module(&main_module).await?;
+        worker.execute_main_module(module).await?;
         worker.run_event_loop(false).await?;
+
+        Ok(())
     }
 }

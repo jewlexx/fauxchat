@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 
 use deno_core::{error::AnyError, extension, op2, Op, OpDecl};
+use deno_runtime::deno_core;
 
 extension!(chat_commands, ops = [op_send]);
 
