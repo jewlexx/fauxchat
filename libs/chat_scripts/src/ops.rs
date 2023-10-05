@@ -12,5 +12,6 @@ pub async fn op_send(
     #[bigint] delay: u64,
     #[string] username: String,
 ) -> Result<(), AnyError> {
+    println!("Sending message: \"{message}\", {count} times, with a delay of {delay}, from user \"{username}\"");
     unimplemented!()
 }
