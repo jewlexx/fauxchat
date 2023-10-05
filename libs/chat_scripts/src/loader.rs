@@ -27,7 +27,7 @@ impl deno_core::ModuleLoader for TsModuleLoader {
             // Determine what the MediaType is (this is done based on the file
             // extension) and whether transpiling is required.
             let media_type = MediaType::from_path(&path);
-            let (module_type, should_transpile) = match media_type.clone() {
+            let (module_type, should_transpile) = match media_type {
                 MediaType::JavaScript | MediaType::Mjs | MediaType::Cjs => {
                     (deno_core::ModuleType::JavaScript, false)
                 }
