@@ -15,6 +15,7 @@ use deno_runtime::{
 
 static CALLBACK: OnceLock<Arc<dyn Fn() + Send + Sync>> = OnceLock::new();
 
+mod loader;
 mod ops;
 
 #[derive(Debug, thiserror::Error)]
