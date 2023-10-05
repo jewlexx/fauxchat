@@ -1,3 +1,5 @@
+import { send } from "./secondary_module";
+
 console.log("pp");
 
-fauxchat.send("poopy");
+send();
