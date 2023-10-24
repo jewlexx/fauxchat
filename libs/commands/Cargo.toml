@@ -9,7 +9,7 @@ license = "MIT AND Apache-2.0"
 [dependencies]
 thiserror = { workspace = true }
 
-litrs = "0.4.0"
+litrs = "0.4.1"
 pest = "2.7.5"
 pest_derive = "2.7.4"
 rand.workspace = true
