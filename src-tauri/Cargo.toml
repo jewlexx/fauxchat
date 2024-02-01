@@ -14,7 +14,7 @@ tauri-build = { version = "1.5", features = [] }
 
 [dependencies]
 tauri = { version = "1.5", features = ["dialog-open", "shell-open"] }
-actix = "0.13.0"
+actix = "0.13.2"
 actix-web = "4.4.0"
 actix-web-actors = "4.2.0"
 tracing-subscriber = "0.3.17"
